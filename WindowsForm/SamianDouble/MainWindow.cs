@@ -17,7 +17,7 @@ namespace SamianDouble
             InitializeComponent();
         }
 
-        static List<Nodes_struct> listnodes;
+        public static List<Nodes_struct> listnodes { get;set; }
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
@@ -87,7 +87,7 @@ namespace SamianDouble
 
         private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            if (e.Label != "")
+            if (e.Label.Length < 2)
             {
                 TreeNode nod = e.Node;
                 nod.Text = e.Label;
@@ -97,6 +97,22 @@ namespace SamianDouble
             else
             {
                 e.CancelEdit = true;
+            }
+        }
+
+        private void treeView1_NodeMouseDoubleClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left && e.Node.Level == 1)
+            {
+                e.Node.ExpandAll();
+                EditNode ed = new EditNode();
+                int i = new Node().getSelectNode(e.Node, listnodes);
+                if (i < 0)
+                    return;
+                EditNode.thisnod = listnodes[i];
+                EditNode.thisnod_i = i;
+                EditNode.tmplistnodes = listnodes;
+                ed.ShowDialog();
             }
         }
     }

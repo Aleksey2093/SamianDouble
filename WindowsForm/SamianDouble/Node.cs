@@ -10,26 +10,35 @@ using System.Windows.Forms;
 
 namespace SamianDouble
 {
-    class Nodes_struct
+    public class Nodes_struct
     {
         public int id;
         public string name;
         public List<Propertys_struct> props;
-        public List<int> connects_in;
-        public List<int> connect_out;
+        public List<Connect_list> connects_in;
+        public List<Connect_list> connect_out;
     }
-    class Propertys_struct
+    public class Connect_list
+    {
+        public int conid;
+        public string connodename;
+        public int ID
+        {
+            get { return conid; }
+            set { conid = value; }
+        }
+        public string Name
+        {
+            get { return connodename; }
+            set { connodename = value; }
+        }
+    }
+    public class Propertys_struct
     {
         public String name;
-        public List<Propertys_struct_value> values;
+        public List<double> values;
         public double value_editor;
         public bool proc100 = false;
-    }
-    class Propertys_struct_value
-    {
-        public double value;
-        public List<int> id_прородителя;
-        public List<string> prop_прородителя;
     }
     class Node
     {
@@ -51,7 +60,7 @@ namespace SamianDouble
             nod.name = "New Node " + nod.id;
             nod.props = new List<Propertys_struct>();
             Propertys_struct p_s = new Propertys_struct();
-            
+
             p_s.name = "Props1";
             p_s.value_editor = 0.5;
             Propertys_struct_value pss = new Propertys_struct_value();
@@ -59,7 +68,7 @@ namespace SamianDouble
             p_s.values = new List<Propertys_struct_value>();
             p_s.values.Add(pss);
             nod.props.Add(p_s);
-            
+
             p_s = new Propertys_struct();
             p_s.name = "Props2";
             p_s.value_editor = 0.5;
@@ -68,9 +77,9 @@ namespace SamianDouble
             p_s.values = new List<Propertys_struct_value>();
             p_s.values.Add(pss);
             nod.props.Add(p_s);
-            
-            nod.connect_out = new List<int>();
-            nod.connects_in = new List<int>();
+
+            nod.connect_out = new List<Connect_list>();
+            nod.connects_in = new List<Connect_list>();
 
             list.Add(nod);
             return list;
@@ -87,30 +96,31 @@ namespace SamianDouble
             //узнаем, что мы изменили свойство или название самого узла
             if (nod.Level == 1)
             {
-                for (int i=0;i<list.Count;i++)
-                {
+                for (int i = 0; i < list.Count; i++)
                     if ((list[i].id.ToString() + list[i].name) == nod.Name)
                     {
                         list[i].name = nod.Text;
                         return list;
                     }
-                }
             }
             else if (nod.Level == 2)
             {
-                for (int i=0;i<list.Count;i++)
-                {
-                    for (int j=0;j<list[i].props.Count;j++)
-                    {
+                for (int i = 0; i < list.Count; i++)
+                    for (int j = 0; j < list[i].props.Count; j++)
                         if ((list[i].id.ToString() + list[i].props[j].name) == nod.Name)
                         {
                             list[i].props[j].name = nod.Text;
                             return list;
                         }
-                    }
-                }
             }
             return list;
+        }
+        public int getSelectNode(TreeNode nod, List<Nodes_struct> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+                if ((list[i].id.ToString() + list[i].name) == nod.Name)
+                    return i;
+            return -1;
         }
     }
 }
