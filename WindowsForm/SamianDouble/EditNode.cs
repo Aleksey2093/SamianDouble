@@ -53,6 +53,15 @@ namespace SamianDouble
             UpdateDataGrivTable();
         }
 
+        private string[][] getMatrixСмежность(int colrow, int colcol)
+        {
+            string[][] mat = new string[colrow][];
+            for (int i = 0; i < colrow; i++)
+                mat[i] = new string[colcol];
+
+                return mat;
+        }
+
         private void UpdateDataGrivTable()
         {
             DataTable table = new DataTable();
