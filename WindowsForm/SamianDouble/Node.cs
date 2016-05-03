@@ -59,23 +59,19 @@ namespace SamianDouble
             nod.id = get_new_id(list);
             nod.name = "New Node " + nod.id;
             nod.props = new List<Propertys_struct>();
-            Propertys_struct p_s = new Propertys_struct();
 
+            Propertys_struct p_s = new Propertys_struct();
             p_s.name = "Props1";
             p_s.value_editor = 0.5;
-            Propertys_struct_value pss = new Propertys_struct_value();
-            pss.value = 0.5;
-            p_s.values = new List<Propertys_struct_value>();
-            p_s.values.Add(pss);
+            p_s.values = new List<double>();
+            p_s.values.Add(0.5);
             nod.props.Add(p_s);
 
             p_s = new Propertys_struct();
             p_s.name = "Props2";
             p_s.value_editor = 0.5;
-            pss = new Propertys_struct_value();
-            pss.value = 0.5;
-            p_s.values = new List<Propertys_struct_value>();
-            p_s.values.Add(pss);
+            p_s.values = new List<double>();
+            p_s.values.Add(0.5);
             nod.props.Add(p_s);
 
             nod.connect_out = new List<Connect_list>();
