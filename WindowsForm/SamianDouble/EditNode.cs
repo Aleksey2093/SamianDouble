@@ -46,6 +46,7 @@ namespace SamianDouble
             listBox3OtherNode.DataSource = othernods;
 
             UpdateDataGrivTable(false);
+            this.Text = "EditNode " + thisnod.name;
         }
 
         public struct propсмежность
