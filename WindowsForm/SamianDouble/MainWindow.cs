@@ -137,7 +137,8 @@ namespace SamianDouble
             TreeNode n4 = new TreeNode("Несвязные");
                  */
                 int index = new Node().getSelectNode(e.Node, listnodes);
-                for (int i=0;i<treeView1.Nodes[0].Nodes.Count;i++)
+                //for (int i=0;i<treeView1.Nodes[0].Nodes.Count;i++)
+                Parallel.For(0,treeView1.Nodes[0].Nodes.Count,(i,state)=>
                 {
                     for (int j=0;j<listnodes[index].connects_in.Count;j++)
                     {
@@ -148,8 +149,9 @@ namespace SamianDouble
                             tr.BackColor = Color.LightBlue;
                         }
                     }
-                }
-                for (int i = 0; i < treeView1.Nodes[1].Nodes.Count; i++)
+                });
+                //for (int i = 0; i < treeView1.Nodes[1].Nodes.Count; i++)
+                Parallel.For(0, treeView1.Nodes[1].Nodes.Count, (i, state) =>
                 {
                     for (int j = 0; j < listnodes[index].connects_in.Count; j++)
                     {
@@ -169,8 +171,9 @@ namespace SamianDouble
                             tr.BackColor = Color.LightGreen;
                         }
                     }
-                }
-                for (int i = 0; i < treeView1.Nodes[2].Nodes.Count; i++)
+                });
+                //for (int i = 0; i < treeView1.Nodes[2].Nodes.Count; i++)
+                Parallel.For(0, treeView1.Nodes[2].Nodes.Count, (i, state) =>
                 {
                     for (int j = 0; j < listnodes[index].connect_out.Count; j++)
                     {
@@ -181,7 +184,7 @@ namespace SamianDouble
                             tr.BackColor = Color.LightGreen;
                         }
                     }
-                }
+                });
             }
         }
     }
