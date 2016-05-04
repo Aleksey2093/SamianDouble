@@ -194,6 +194,7 @@
             this.button1Сохранить.TabIndex = 0;
             this.button1Сохранить.Text = "Сохранить";
             this.button1Сохранить.UseVisualStyleBackColor = true;
+            this.button1Сохранить.Click += new System.EventHandler(this.button1Сохранить_Click);
             // 
             // button1Отменить
             // 
@@ -203,6 +204,7 @@
             this.button1Отменить.TabIndex = 1;
             this.button1Отменить.Text = "Отменить";
             this.button1Отменить.UseVisualStyleBackColor = true;
+            this.button1Отменить.Click += new System.EventHandler(this.button1Отменить_Click);
             // 
             // EditNode
             // 

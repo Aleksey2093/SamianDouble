@@ -109,10 +109,11 @@ namespace SamianDouble
                 int i = new Node().getSelectNode(e.Node, listnodes);
                 if (i < 0)
                     return;
-                EditNode.thisnod = listnodes[i];
-                EditNode.thisnod_i = i;
-                EditNode.tmplistnodes = listnodes;
+
+                ed.copyDataNew(listnodes[i], i, listnodes);
+
                 ed.ShowDialog();
+                treeListReplace();
             }
         }
     }

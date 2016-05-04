@@ -12,20 +12,20 @@ namespace SamianDouble
 {
     public partial class EditNode : Form
     {
-        /// <summary>
-        /// узел с которым будем работать
-        /// </summary>
-        public static Nodes_struct thisnod { get; set; }
-        /// <summary>
-        /// ид этого узла
-        /// </summary>
-        public static int thisnod_i { get; set; }
-        /// <summary>
-        /// список других узлов в дереве за исключением тех, с которым у нас уже есть связь
-        /// </summary>
-        public static List<Othernode> othernods { get; set; }
+        private Nodes_struct thisnod;
+        
+        private int thisnod_i;
 
-        public static List<Nodes_struct> tmplistnodes { get; set; }
+        private List<Othernode> othernods;
+
+        private List<Nodes_struct> tmplistnodes;
+
+        public void copyDataNew(Nodes_struct n1, int i, List<Nodes_struct> nmany)
+        {
+            thisnod = n1;
+            thisnod_i = i;
+            tmplistnodes = nmany;
+        }
 
         public EditNode()
         {
@@ -162,6 +162,7 @@ namespace SamianDouble
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = table;
             dataGridView1.ColumnHeadersVisible = false;
+            List<Nodes_struct> dwad = MainWindow.listnodes;
         }
         /// <summary>
         /// загружает список узлов с которыми нет связи.
@@ -171,25 +172,26 @@ namespace SamianDouble
         {
             othernods = new List<Othernode>();
             List<Nodes_struct> list = tmplistnodes;
-            Othernode ot;
-            for (int i = 0; i < list.Count; i++)
+            Parallel.For(0, list.Count, (i,state) =>
             {
                 bool ifi = true;
-                if (list[i] == thisnod)
+                if (list[i].id == thisnod.id)
                 {
                     ifi = false;
                 }
-
-                ifi = getProvConnectNodeToNode(list[i]);
-
                 if (ifi)
                 {
-                    ot = new Othernode();
-                    ot.id = list[i].id;
-                    ot.name = list[i].name;
-                    othernods.Add(ot);
+                    ifi = getProvConnectNodeToNode(list[i]);
+                    if (ifi)
+                    {
+                        Othernode ot = new Othernode();
+                        ot.id = list[i].id;
+                        ot.name = list[i].name;
+                        othernods.Add(ot);
+
+                    }
                 }
-            }
+            });
             return true;
         }
 
@@ -206,10 +208,10 @@ namespace SamianDouble
 
         private void EditNode_FormClosing(object sender, FormClosingEventArgs e)
         {
-            thisnod = null;
-            thisnod_i = -1;
-            tmplistnodes = null;
-            othernods = null;
+            thisnod = new Nodes_struct();
+            thisnod_i = new int();
+            tmplistnodes = new List<Nodes_struct>();
+            othernods = new List<Othernode>();
         }
 
         private void listBox3OtherNode_MouseDown(object sender, MouseEventArgs e)
@@ -336,6 +338,23 @@ namespace SamianDouble
         private void listBox1ConnectIn_DragEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Copy;
+        }
+
+        private void button1Сохранить_Click(object sender, EventArgs e)
+        {
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+                {
+                    if (tmplistnodes[i].id == thisnod.id)
+                    {
+                        tmplistnodes[i] = thisnod;
+                        state.Break();
+                    }
+                });
+        }
+
+        private void button1Отменить_Click(object sender, EventArgs e)
+        {
+            
         }
     }
     public class Othernode
