@@ -121,7 +121,10 @@ namespace SamianDouble
                         Propertys_struct pr = new Propertys_struct();
                         pr.name = "Props" + (1+list[i].props.Count);
                         pr.values = new List<double>();
-                        pr.values.AddRange(list[i].props[0].values);
+                        Parallel.ForEach(list[i].props[0].values, (val) =>
+                            {
+                                pr.values.Add(0);
+                            });
                         list[i].props.Add(pr);
                         return list;
                     }
@@ -134,6 +137,32 @@ namespace SamianDouble
                 if ((list[i].id.ToString() + list[i].name) == nod.Name)
                     return i;
             return -1;
+        }
+        /// <summary>
+        /// возвращает список в котором удалено свойство текущего узла
+        /// </summary>
+        /// <param name="nod">узел с дерева treeview</param>
+        /// <param name="listnodes">список узлов</param>
+        /// <returns></returns>
+        internal List<Nodes_struct> nodeDeletePropertyThisNod(TreeNode nod, List<Nodes_struct> listnodes)
+        {
+            Parallel.ForEach(listnodes, (nodlist, state) =>
+                {
+                    if (nodlist.id.ToString()+nodlist.name == nod.Parent.Name)
+                    {
+                        Parallel.For(0,nodlist.props.Count, (i, stateдва) =>
+                            {
+                                if (nodlist.props[i].name == nod.Text)
+                                {
+                                    nodlist.props.RemoveAt(i);
+                                    stateдва.Break();
+                                }
+                            });
+                        state.Break();
+                    }
+                });
+
+            return listnodes;
         }
     }
     class UpdateNode

@@ -78,12 +78,12 @@ namespace SamianDouble
                     }
                 });
             //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
-            for (int i = colrow - 1, index = 0, h = 1; i >= 0;i--,index++)
+            for (int i = colrow - 1, index = 0, h = 1; i >= 0; i--, index++)
             {
                 //цикл движется от последней строки до первой
                 //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
                 int hh = 0; var othnod = listik[idnodes[index]];
-                for (int j=0, ij=0;j<colcol;j++)
+                for (int j = 0, ij = 0; j < colcol; j++)
                 {
                 ifigoto:
                     if (hh < h)
@@ -101,15 +101,15 @@ namespace SamianDouble
                         goto ifigoto;
                     }
                 }
-                if (h < 2)
-                    h++;
+                if (h == 1)
+                    h = othnod.props.Count;
                 else
                 {
-                    h = h * 2;
+                    h = h * othnod.props.Count;
                 }
             }
             //получили верхнюю часть матрицы смежности поидее в нужном нам виде.
-                return mat;
+            return mat;
         }
 
         private void UpdateDataGrivTable(bool параметр)
@@ -162,8 +162,8 @@ namespace SamianDouble
             rows = rows - thisnod.props.Count;
             if (smej && thisnod.connects_in.Count > 0)
             {
-                propсмежность[][] mat = getMatrixСмежность(thisnod,rows, len_columns - 1,tmplistnodes);
-                for (i = 0;i<rows;i++)
+                propсмежность[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
+                for (i = 0; i < rows; i++)
                 {
                     for (j = 1; j < len_columns; j++)
                     {
@@ -178,13 +178,13 @@ namespace SamianDouble
                     double[] values_p = new NodeValueMath().values_editors(mat, thisnod, tmplistnodes);
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
-                        table.Rows[i + rows]["Вероятности"] = Math.Round(values_p[i],2);
+                        table.Rows[i + rows]["Вероятности"] = Math.Round(values_p[i], 2);
                     }
                 }
             }
-            for (i = 0; i < thisnod.props.Count;i++ )
+            for (i = 0; i < thisnod.props.Count; i++)
             {
-                for (j=0;j<thisnod.props[i].values.Count;j++)
+                for (j = 0; j < thisnod.props[i].values.Count; j++)
                 {
                     table.Rows[i + rows][j + 1] = thisnod.props[i].values[j];
                 }
@@ -198,7 +198,7 @@ namespace SamianDouble
         {
             othernods = new List<Othernode>();
             List<Nodes_struct> list = tmplistnodes;
-            Parallel.For(0, list.Count, (i,state) =>
+            Parallel.For(0, list.Count, (i, state) =>
             {
                 bool ifi = true;
                 if (list[i].id == thisnod.id)
@@ -223,7 +223,7 @@ namespace SamianDouble
 
         private bool getProvConnectNodeToNode(Nodes_struct nodes_struct)
         {
-            for (int i=0;i<thisnod.connects_in.Count;i++)
+            for (int i = 0; i < thisnod.connects_in.Count; i++)
                 if (thisnod.connects_in[i].conid == nodes_struct.id)
                     return false;
             for (int i = 0; i < thisnod.connect_out.Count; i++)
@@ -276,7 +276,7 @@ namespace SamianDouble
                 string name = lbl.Text.ToString();
                 lbl.DoDragDrop("2" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
             }
@@ -295,11 +295,11 @@ namespace SamianDouble
                 if (name[i] == ' ')
                 {
                     id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i+1);
+                    name = name.Remove(0, i + 1);
                     break;
                 }
             }
-            if (id == -1) 
+            if (id == -1)
                 return;
             UpdateNode ap = new UpdateNode();
             for (int i = 0; i < thisnod.connects_in.Count; i++)
@@ -342,7 +342,7 @@ namespace SamianDouble
             for (int i = 0; i < thisnod.connect_out.Count; i++)
                 if (id == thisnod.connect_out[i].ID)
                     return;
-            for (int i=0;i<othernods.Count;i++)
+            for (int i = 0; i < othernods.Count; i++)
                 if (id == othernods[i].ID)
                 {
                     othernods.RemoveAt(i);
@@ -390,7 +390,7 @@ namespace SamianDouble
                 if (name[i] == ' ')
                 {
                     id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i+1);
+                    name = name.Remove(0, i + 1);
                     break;
                 }
             }
@@ -485,7 +485,7 @@ namespace SamianDouble
                 if (name[i] == ' ')
                 {
                     id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i+1);
+                    name = name.Remove(0, i + 1);
                     break;
                 }
             }
@@ -564,7 +564,7 @@ namespace SamianDouble
 
         private void button1Отменить_Click(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button1Math_Click(object sender, EventArgs e)
@@ -585,11 +585,11 @@ namespace SamianDouble
                         if (!double.TryParse(dataGridView1.Rows[i].Cells[j].Value.ToString().Replace(".", ","), out value))
                             if (!double.TryParse(dataGridView1.Rows[i].Cells[j].Value.ToString().Replace(",", "."), out value))
                             {
-                                MessageBox.Show("Ошибка при проведении расчетов во время сохранения таблицы. Ошибка при конвертировании значения таблицы в double", "", 
+                                MessageBox.Show("Ошибка при проведении расчетов во время сохранения таблицы. Ошибка при конвертировании значения таблицы в double", "",
                                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
                                 return false;
                             }
-                    thisnod.props[i-thisnod.connects_in.Count].values[j-1] = value;
+                    thisnod.props[i - thisnod.connects_in.Count].values[j - 1] = value;
                 }
             try
             {
@@ -617,6 +617,24 @@ namespace SamianDouble
         private void button1СохранитьТаблицу_Click(object sender, EventArgs e)
         {
             Сохр_таблицу_в_узел();
+        }
+
+        private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                double сумма = 0;
+                for (int i = thisnod.connects_in.Count; i < dataGridView1.Rows.Count; i++)
+                {
+                    сумма += (double)dataGridView1.Rows[i].Cells[e.ColumnIndex].Value;
+                }
+                if (сумма > 1)
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+            }
+            catch (Exception ex)
+            {
+                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+            }
         }
     }
     public class Othernode

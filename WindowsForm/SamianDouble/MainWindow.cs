@@ -148,14 +148,8 @@ namespace SamianDouble
                         });
                 }
                 e.Node.BackColor = Color.Red;
-                /*
-                 *             TreeNode n1 = new TreeNode("Родители");
-            TreeNode n2 = new TreeNode("Промежуточные");
-            TreeNode n3 = new TreeNode("Дети");
-            TreeNode n4 = new TreeNode("Несвязные");
-                 */
+                
                 int index = new Node().getSelectNode(e.Node, listnodes);
-                //for (int i=0;i<treeView1.Nodes[0].Nodes.Count;i++)
                 Parallel.For(0,treeView1.Nodes[0].Nodes.Count,(i,state)=>
                 {
                     for (int j=0;j<listnodes[index].connects_in.Count;j++)
@@ -168,7 +162,6 @@ namespace SamianDouble
                         }
                     }
                 });
-                //for (int i = 0; i < treeView1.Nodes[1].Nodes.Count; i++)
                 Parallel.For(0, treeView1.Nodes[1].Nodes.Count, (i, state) =>
                 {
                     for (int j = 0; j < listnodes[index].connects_in.Count; j++)
@@ -190,7 +183,6 @@ namespace SamianDouble
                         }
                     }
                 });
-                //for (int i = 0; i < treeView1.Nodes[2].Nodes.Count; i++)
                 Parallel.For(0, treeView1.Nodes[2].Nodes.Count, (i, state) =>
                 {
                     for (int j = 0; j < listnodes[index].connect_out.Count; j++)
@@ -205,7 +197,7 @@ namespace SamianDouble
                 });
             } else if (e.Button == MouseButtons.Right && e.Node.Level == 1)
             {
-                if (DialogResult.Yes != MessageBox.Show("Добавить узлу " + e.Node.Text + " новое свойство", "", 
+                if (DialogResult.Yes != MessageBox.Show("Добавить узлу " + e.Node.Text + " новое свойство", "Добавление", 
                     MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1))
                 {
                     return;
@@ -213,6 +205,17 @@ namespace SamianDouble
                 TreeNode nod = e.Node;
                 Node n = new Node();
                 listnodes = n.nodeAddNewProperty(nod, listnodes);
+                treeListReplace();
+            } else if (e.Button == MouseButtons.Right && e.Node.Level == 2 && e.Node.Parent.Nodes.Count > 2)
+            {
+                if (DialogResult.Yes != MessageBox.Show("Удалить узлу " + e.Node.Parent.Text + " свойство " + e.Node.Text, "Удаление",
+    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1))
+                {
+                    return;
+                }
+                TreeNode nod = e.Node;
+                Node n = new Node();
+                listnodes = n.nodeDeletePropertyThisNod(nod, listnodes);
                 treeListReplace();
             }
         }
