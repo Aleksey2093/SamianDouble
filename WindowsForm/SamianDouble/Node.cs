@@ -344,8 +344,10 @@ namespace SamianDouble
                 {
                     values[i] += nod.props[i].values[j] * matrix[0, j];
                 }
+                values[i] = Math.Round(values[i], 4);
+                nod.props[i].value_editor = values[i];
+                
             }
-            //nod.props[i].value_editor = values[i] = 1;
             return values;
         }
         public double getNodPropsValueEditor(List<Nodes_struct> list, int id,string nameprop)
@@ -361,15 +363,20 @@ namespace SamianDouble
                     }
                 });
             double value = -1;
-            Parallel.For(0, nod.props.Count, (i,state) =>
+            Parallel.For(0, nod.props.Count, (i, state) =>
                 {
-                    if (nod.props[i].values.Count>1)
+                    if (nod.props[i].name == nameprop)
                     {
-
-                    }
-                    else 
-                    {
-                        value = nod.props[i].values[0];
+                        if (nod.props[i].values.Count > 1)
+                        {
+                            EditNode.propсмежность[][] см = new EditNode().getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
+                            values_editors(см, nod, list);
+                            value = nod.props[i].value_editor;
+                        }
+                        else
+                        {
+                            value = nod.props[i].values[0];
+                        }
                     }
                 });
             return value;

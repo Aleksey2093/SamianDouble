@@ -54,17 +54,23 @@ namespace SamianDouble
             public string prop_name;
         }
 
-        private propсмежность[][] getMatrixСмежность(int colrow, int colcol)
+        /// <summary>
+        /// возвращает смежную матрицу узлов
+        /// </summary>
+        /// <param name="colrow">строки - количество связей входящих</param>
+        /// <param name="colcol">столбцы - длинна одной линии значений (они все одинаковые должны быть, если не было ошибок)</param>
+        /// <returns></returns>
+        public propсмежность[][] getMatrixСмежность(Nodes_struct tmpinode, int colrow, int colcol, List<Nodes_struct> listik)
         {
             propсмежность[][] mat = new propсмежность[colrow][];
             List<int> idnodes = new List<int>();
             for (int i = 0; i < colrow; i++)
                 mat[i] = new propсмежность[colcol];
-            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+            Parallel.For(0, listik.Count, (i, state) =>
                 {
-                    for (int j=0;j<thisnod.connects_in.Count;j++)
+                    for (int j = 0; j < tmpinode.connects_in.Count; j++)
                     {
-                        if (thisnod.connects_in[j].ID == tmplistnodes[i].id)
+                        if (tmpinode.connects_in[j].ID == listik[i].id)
                         {
                             idnodes.Add(i);
                         }
@@ -75,7 +81,7 @@ namespace SamianDouble
             {
                 //цикл движется от последней строки до первой
                 //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
-                int hh = 0; var othnod = tmplistnodes[idnodes[index]];
+                int hh = 0; var othnod = listik[idnodes[index]];
                 for (int j=0, ij=0;j<colcol;j++)
                 {
                 ifigoto:
@@ -155,7 +161,7 @@ namespace SamianDouble
             rows = rows - thisnod.props.Count;
             if (smej && thisnod.connects_in.Count > 0)
             {
-                propсмежность[][] mat = getMatrixСмежность(rows, len_columns - 1);
+                propсмежность[][] mat = getMatrixСмежность(thisnod,rows, len_columns - 1,tmplistnodes);
                 for (i = 0;i<rows;i++)
                 {
                     for (j = 1; j < len_columns; j++)
@@ -171,7 +177,7 @@ namespace SamianDouble
                     double[] values_p = new NodeValueMath().values_editors(mat, thisnod, tmplistnodes);
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
-                        table.Rows[i + rows]["Вероятности"] = values_p[i];
+                        table.Rows[i + rows]["Вероятности"] = Math.Round(values_p[i],2);
                     }
                 }
             }
@@ -227,10 +233,7 @@ namespace SamianDouble
 
         private void EditNode_FormClosing(object sender, FormClosingEventArgs e)
         {
-            /*thisnod = new Nodes_struct();
-            thisnod_i = new int();
-            tmplistnodes = new List<Nodes_struct>();
-            othernods = new List<Othernode>();*/
+            thisnod.name = textBox1.Text;
         }
 
         private void listBox3OtherNode_MouseDown(object sender, MouseEventArgs e)
@@ -296,11 +299,46 @@ namespace SamianDouble
             }
             if (id == -1) 
                 return;
-            for (int i = 0; i < thisnod.connect_out.Count; i++)
-                if (id == thisnod.connect_out[i].ID)
-                    return;
+            UpdateNode ap = new UpdateNode();
             for (int i = 0; i < thisnod.connects_in.Count; i++)
                 if (id == thisnod.connects_in[i].ID)
+                {
+                    if (what == 1) //out
+                    {
+                        tmplistnodes = ap.DeleteNodeConnectOut(tmplistnodes, thisnod, id);
+                    }
+                    else if (what == 2) //in
+                    {
+                        tmplistnodes = ap.DeleteNodeConnectIn(tmplistnodes, thisnod, id);
+                    }
+
+                    Parallel.For(0, tmplistnodes.Count, (j, state) =>
+                    {
+                        if (tmplistnodes[j].id == thisnod.id)
+                        {
+                            thisnod = tmplistnodes[j];
+                            state.Break();
+                        }
+                    });
+                    if (what == 1) //out
+                    {
+                        listBox2ConnectOut.DataSource = null;
+                        listBox2ConnectOut.DisplayMember = "Name";
+                        listBox2ConnectOut.ValueMember = "ID";
+                        listBox2ConnectOut.DataSource = thisnod.connect_out;
+                    }
+                    else if (what == 2)
+                    {
+                        listBox1ConnectIn.DataSource = null;
+                        listBox1ConnectIn.DisplayMember = "Name";
+                        listBox1ConnectIn.ValueMember = "ID";
+                        listBox1ConnectIn.DataSource = thisnod.connects_in;
+                    }
+                    UpdateDataGrivTable(false);
+                    //return;
+                }
+            for (int i = 0; i < thisnod.connect_out.Count; i++)
+                if (id == thisnod.connect_out[i].ID)
                     return;
             for (int i=0;i<othernods.Count;i++)
                 if (id == othernods[i].ID)
@@ -313,7 +351,6 @@ namespace SamianDouble
             listBox3OtherNode.ValueMember = "ID";
             listBox3OtherNode.DataSource = othernods;
 
-            UpdateNode ap = new UpdateNode();
             tmplistnodes = ap.UpdateNodeConnectOut(tmplistnodes, thisnod, id);
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
@@ -357,9 +394,44 @@ namespace SamianDouble
             }
             if (id == -1)
                 return;
+            UpdateNode ap = new UpdateNode();
             for (int i = 0; i < thisnod.connect_out.Count; i++)
                 if (id == thisnod.connect_out[i].ID)
-                    return;
+                {
+                    if (what == 1) //out
+                    {
+                        tmplistnodes = ap.DeleteNodeConnectOut(tmplistnodes, thisnod, id);
+                    }
+                    else if (what == 2) //in
+                    {
+                        tmplistnodes = ap.DeleteNodeConnectIn(tmplistnodes, thisnod, id);
+                    }
+
+                    Parallel.For(0, tmplistnodes.Count, (j, state) =>
+                    {
+                        if (tmplistnodes[j].id == thisnod.id)
+                        {
+                            thisnod = tmplistnodes[j];
+                            state.Break();
+                        }
+                    });
+                    if (what == 1) //out
+                    {
+                        listBox2ConnectOut.DataSource = null;
+                        listBox2ConnectOut.DisplayMember = "Name";
+                        listBox2ConnectOut.ValueMember = "ID";
+                        listBox2ConnectOut.DataSource = thisnod.connect_out;
+                    }
+                    else if (what == 2)
+                    {
+                        listBox1ConnectIn.DataSource = null;
+                        listBox1ConnectIn.DisplayMember = "Name";
+                        listBox1ConnectIn.ValueMember = "ID";
+                        listBox1ConnectIn.DataSource = thisnod.connects_in;
+                    }
+                    UpdateDataGrivTable(false);
+                    //return;
+                }
             for (int i = 0; i < thisnod.connects_in.Count; i++)
                 if (id == thisnod.connects_in[i].ID)
                     return;
@@ -375,7 +447,6 @@ namespace SamianDouble
             listBox3OtherNode.ValueMember = "ID";
             listBox3OtherNode.DataSource = othernods;
 
-            UpdateNode ap = new UpdateNode();
             tmplistnodes = ap.UpdateNodeConnectIn(tmplistnodes, thisnod, id);
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
@@ -496,7 +567,54 @@ namespace SamianDouble
 
         private void button1Math_Click(object sender, EventArgs e)
         {
-            UpdateDataGrivTable(true);
+            if (Сохр_таблицу_в_узел())
+                UpdateDataGrivTable(true);
+        }
+
+        private bool Сохр_таблицу_в_узел()
+        {
+            int n = dataGridView1.Rows.Count;
+            int m = 1 + thisnod.props[0].values.Count;
+            for (int i = thisnod.connects_in.Count; i < n; i++)
+                for (int j = 1; j < m; j++)
+                {
+                    double value;
+                    if (!double.TryParse(dataGridView1.Rows[i].Cells[j].Value.ToString(), out value))
+                        if (!double.TryParse(dataGridView1.Rows[i].Cells[j].Value.ToString().Replace(".", ","), out value))
+                            if (!double.TryParse(dataGridView1.Rows[i].Cells[j].Value.ToString().Replace(",", "."), out value))
+                            {
+                                MessageBox.Show("Ошибка при проведении расчетов во время сохранения таблицы. Ошибка при конвертировании значения таблицы в double", "", 
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                                return false;
+                            }
+                    thisnod.props[i-thisnod.connects_in.Count].values[j-1] = value;
+                }
+            try
+            {
+                for (int i = thisnod.connects_in.Count; i < n; i++)
+                {
+                    double value;
+                    if (!double.TryParse(dataGridView1.Rows[i].Cells["Вероятности"].Value.ToString(), out value))
+                        if (!double.TryParse(dataGridView1.Rows[i].Cells["Вероятности"].Value.ToString().Replace(".", ","), out value))
+                            if (!double.TryParse(dataGridView1.Rows[i].Cells["Вероятности"].Value.ToString().Replace(",", "."), out value))
+                            {
+                                MessageBox.Show("Ошибка при проведении расчетов во время сохранения таблицы. Ошибка при конвертировании значения таблицы в double", "",
+                                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                                return false;
+                            }
+                    thisnod.props[i - thisnod.connects_in.Count].value_editor = value;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Нету столбца вероятностей. Ошибка - " + ex.ToString());
+            }
+            return true;
+        }
+
+        private void button1СохранитьТаблицу_Click(object sender, EventArgs e)
+        {
+            Сохр_таблицу_в_узел();
         }
     }
     public class Othernode

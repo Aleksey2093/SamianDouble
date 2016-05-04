@@ -42,6 +42,7 @@
             this.button1Сохранить = new System.Windows.Forms.Button();
             this.button1Отменить = new System.Windows.Forms.Button();
             this.button1Math = new System.Windows.Forms.Button();
+            this.button1СохранитьТаблицу = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -186,6 +187,7 @@
             this.flowLayoutPanel1.Controls.Add(this.button1Сохранить);
             this.flowLayoutPanel1.Controls.Add(this.button1Отменить);
             this.flowLayoutPanel1.Controls.Add(this.button1Math);
+            this.flowLayoutPanel1.Controls.Add(this.button1СохранитьТаблицу);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 497);
@@ -225,6 +227,16 @@
             this.button1Math.UseVisualStyleBackColor = true;
             this.button1Math.Click += new System.EventHandler(this.button1Math_Click);
             // 
+            // button1СохранитьТаблицу
+            // 
+            this.button1СохранитьТаблицу.Location = new System.Drawing.Point(525, 3);
+            this.button1СохранитьТаблицу.Name = "button1СохранитьТаблицу";
+            this.button1СохранитьТаблицу.Size = new System.Drawing.Size(119, 23);
+            this.button1СохранитьТаблицу.TabIndex = 3;
+            this.button1СохранитьТаблицу.Text = "Сохранить таблицу";
+            this.button1СохранитьТаблицу.UseVisualStyleBackColor = true;
+            this.button1СохранитьТаблицу.Click += new System.EventHandler(this.button1СохранитьТаблицу_Click);
+            // 
             // EditNode
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -261,5 +273,6 @@
         private System.Windows.Forms.Button button1Сохранить;
         private System.Windows.Forms.Button button1Отменить;
         private System.Windows.Forms.Button button1Math;
+        private System.Windows.Forms.Button button1СохранитьТаблицу;
     }
 }
