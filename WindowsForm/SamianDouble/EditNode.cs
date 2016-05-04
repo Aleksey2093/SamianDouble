@@ -450,10 +450,113 @@ namespace SamianDouble
             //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
             for (int j = 0; j < other_nod.props.Count; j++)
             {
-                List<double> vals = nod.props[j].values; //изначальное количество и значения до увеличения значений данного свойства
+                //List<double> vals = nod.props[j].values; //изначальное количество и значения до увеличения значений данного свойства
+                double[] vals = new double[nod.props[j].values.Count * other_nod.props.Count];
+                Parallel.For(0, vals.Length, (i, state) =>
+                {
+                    vals[i] = 0.5;
+                });
+                other_nod.props[j].values.Clear();
+                other_nod.props[j].values.AddRange(vals);
+            }
+            return list;
+        }
+
+        public List<Nodes_struct> DeleteNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        {
+            int jb = 0;
+            Parallel.For(0, list.Count, (i, state) =>
+            {
+                if (list[i].id == id_other)
+                {
+                    for (int j = 0; j < list[i].connect_out.Count; j++)
+                    {
+                        if (list[i].connect_out[j].ID == nod.id)
+                        {
+                            list[i].connect_out.RemoveAt(j);
+                            jb = i;
+                            break;
+                        }
+                    }
+                    state.Break(); //находим нужный нам нод и выходим из цикла
+                }
+            });
+            //теперь нужно удалить связи: исходяющую связь в другой нод и в наш входяющую
+            Parallel.For(0, list.Count, (i, state) =>
+            {
+                if (nod.id == list[i].id)
+                {
+                    for (int j = 0; j < list[i].connects_in.Count; j++)
+                    {
+                        if (list[i].connects_in[j].ID == id_other)
+                        {
+                            list[i].connects_in.RemoveAt(j);
+                            break;
+                        }
+                    }
+                    state.Break();
+                }
+            });
+            //связи удалены, теперь нужно добавить дополнительные свойства
+            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
+            for (int j = 0; j < nod.props.Count; j++)
+            {
+                List<double> vals = list[jb].props[j].values; //изначальное количество и значения до уменьшения значений данного свойства
+                int len = list[jb].props[j].values.Count;
                 for (int i = 0; i < nod.props.Count; i++)
                 {
-                    other_nod.props[j].values.AddRange(vals); // на этом шаге увеличиваем в два раза количество значений
+                    int count = nod.props[j].values.Count;
+                    nod.props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
+                }
+            }
+            return list;
+        }
+
+        public List<Nodes_struct> DeleteNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        {
+            int jb = 0;
+            Parallel.For(0, list.Count, (i, state) =>
+            {
+                if (list[i].id == id_other)
+                {
+                    for (int j = 0; j < list[i].connects_in.Count;j++ )
+                    {
+                        if (list[i].connects_in[j].ID == nod.id)
+                        {
+                            list[i].connects_in.RemoveAt(j);
+                            jb = i;
+                            break;
+                        }
+                    }
+                        state.Break(); //находим нужный нам нод и выходим из цикла
+                }
+            });
+            //теперь нужно удалить связи: исходяющую связь в другой нод и в наш входяющую
+            Parallel.For(0, list.Count, (i, state) =>
+                {
+                    if (nod.id == list[i].id)
+                    {
+                        for (int j=0;j<list[i].connect_out.Count;j++)
+                        {
+                            if (list[i].connect_out[j].ID == id_other)
+                            {
+                                list[i].connect_out.RemoveAt(j);
+                                break;
+                            }
+                        }
+                        state.Break();
+                    }
+                });
+            //связи удалены, теперь нужно добавить дополнительные свойства
+            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
+            for (int j = 0; j < list[jb].props.Count; j++)
+            {
+                List<double> vals = nod.props[j].values; //изначальное количество и значения до уменьшения значений данного свойства
+                int len = nod.props[j].values.Count;
+                for (int i = 0; i < nod.props.Count; i++)
+                {
+                    int count = list[jb].props[j].values.Count;
+                    list[jb].props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
                 }
             }
             return list;
