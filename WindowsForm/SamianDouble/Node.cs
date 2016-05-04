@@ -111,6 +111,23 @@ namespace SamianDouble
             }
             return list;
         }
+        public List<Nodes_struct> nodeAddNewProperty(TreeNode nod, List<Nodes_struct> list)
+        {
+            if (nod.Level == 1)
+            {
+                for (int i = 0; i < list.Count; i++)
+                    if ((list[i].id.ToString() + list[i].name) == nod.Name)
+                    {
+                        Propertys_struct pr = new Propertys_struct();
+                        pr.name = "Props" + (1+list[i].props.Count);
+                        pr.values = new List<double>();
+                        pr.values.AddRange(list[i].props[0].values);
+                        list[i].props.Add(pr);
+                        return list;
+                    }
+            }
+            return list;
+        }
         public int getSelectNode(TreeNode nod, List<Nodes_struct> list)
         {
             for (int i = 0; i < list.Count; i++)

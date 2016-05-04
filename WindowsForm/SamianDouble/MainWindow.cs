@@ -88,7 +88,17 @@ namespace SamianDouble
 
         private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
         {
-            if (e.Label.Length < 2)
+            if (e.Label == null)
+            {
+                e.CancelEdit = true;
+                return;
+            }
+            if (e.Label == e.Node.Text)
+            {
+                e.CancelEdit = true;
+                return;
+            }
+            if (e.Label.Length > 2)
             {
                 TreeNode nod = e.Node;
                 nod.Text = e.Label;
@@ -128,8 +138,15 @@ namespace SamianDouble
 
         private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Node.Level == 1)
             {
+                for (int j=0;j<treeView1.Nodes.Count;j++)
+                {
+                    Parallel.For(0, treeView1.Nodes[j].Nodes.Count, (i, state) =>
+                        {
+                            treeView1.Nodes[j].Nodes[i].BackColor = Color.White;
+                        });
+                }
                 e.Node.BackColor = Color.Red;
                 /*
                  *             TreeNode n1 = new TreeNode("Родители");
@@ -186,6 +203,17 @@ namespace SamianDouble
                         }
                     }
                 });
+            } else if (e.Button == MouseButtons.Right && e.Node.Level == 1)
+            {
+                if (DialogResult.Yes != MessageBox.Show("Добавить узлу " + e.Node.Text + " новое свойство", "", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1))
+                {
+                    return;
+                }
+                TreeNode nod = e.Node;
+                Node n = new Node();
+                listnodes = n.nodeAddNewProperty(nod, listnodes);
+                treeListReplace();
             }
         }
 
