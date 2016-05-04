@@ -626,14 +626,26 @@ namespace SamianDouble
                 double сумма = 0;
                 for (int i = thisnod.connects_in.Count; i < dataGridView1.Rows.Count; i++)
                 {
-                    сумма += (double)dataGridView1.Rows[i].Cells[e.ColumnIndex].Value;
+                    double v = 0;
+                    if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString(), out v))
+                        if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString().Replace(".", ","), out v))
+                            if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString().Replace(",", "."), out v))
+                            {
+                                dataGridView1.Rows[i].Cells[e.ColumnIndex].Value = "0";
+                                return;
+                            }
+                    if (v < 0)
+                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = Math.Abs(v).ToString();
+                    else
+                        v = Math.Abs(v);
+                    сумма += v;
                 }
                 if (сумма > 1)
-                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = "0";
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = 0;
+                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = "0";
             }
         }
     }
