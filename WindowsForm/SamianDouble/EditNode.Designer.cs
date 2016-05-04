@@ -41,6 +41,7 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button1Сохранить = new System.Windows.Forms.Button();
             this.button1Отменить = new System.Windows.Forms.Button();
+            this.button1Math = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -184,6 +185,7 @@
             this.flowLayoutPanel1.AutoSize = true;
             this.flowLayoutPanel1.Controls.Add(this.button1Сохранить);
             this.flowLayoutPanel1.Controls.Add(this.button1Отменить);
+            this.flowLayoutPanel1.Controls.Add(this.button1Math);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 497);
@@ -199,6 +201,7 @@
             this.button1Сохранить.TabIndex = 0;
             this.button1Сохранить.Text = "Сохранить";
             this.button1Сохранить.UseVisualStyleBackColor = true;
+            this.button1Сохранить.Visible = false;
             this.button1Сохранить.Click += new System.EventHandler(this.button1Сохранить_Click);
             // 
             // button1Отменить
@@ -209,7 +212,18 @@
             this.button1Отменить.TabIndex = 1;
             this.button1Отменить.Text = "Отменить";
             this.button1Отменить.UseVisualStyleBackColor = true;
+            this.button1Отменить.Visible = false;
             this.button1Отменить.Click += new System.EventHandler(this.button1Отменить_Click);
+            // 
+            // button1Math
+            // 
+            this.button1Math.Location = new System.Drawing.Point(650, 3);
+            this.button1Math.Name = "button1Math";
+            this.button1Math.Size = new System.Drawing.Size(75, 23);
+            this.button1Math.TabIndex = 2;
+            this.button1Math.Text = "Расчет";
+            this.button1Math.UseVisualStyleBackColor = true;
+            this.button1Math.Click += new System.EventHandler(this.button1Math_Click);
             // 
             // EditNode
             // 
@@ -242,9 +256,10 @@
         private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.FlowLayoutPanel flowLayoutPanel1;
-        private System.Windows.Forms.Button button1Сохранить;
-        private System.Windows.Forms.Button button1Отменить;
         private System.Windows.Forms.ListBox listBox3OtherNode;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Button button1Сохранить;
+        private System.Windows.Forms.Button button1Отменить;
+        private System.Windows.Forms.Button button1Math;
     }
 }

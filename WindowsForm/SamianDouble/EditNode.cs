@@ -14,27 +14,13 @@ namespace SamianDouble
 {
     public partial class EditNode : Form
     {
-        private Nodes_struct thisnod;
-        
-        private int thisnod_i;
+        public Nodes_struct thisnod { get; set; }
 
-        private List<Othernode> othernods;
+        public int thisnod_i { get; set; }
 
-        private List<Nodes_struct> tmplistnodes;
+        public List<Othernode> othernods { get; set; }
 
-        public void copyDataNew(/*Nodes_struct n1,*/ int k, List<Nodes_struct> nmany)
-        {
-            tmplistnodes = new List<Nodes_struct>(nmany);
-            Parallel.For(0,nmany.Count,(j,state)=>
-                {
-                    if (tmplistnodes[j].id == k)
-                    {
-                        thisnod = tmplistnodes[j];
-                        state.Break();
-                    }
-                });
-            thisnod_i = k;
-        }
+        public List<Nodes_struct> tmplistnodes { get; set; }
 
         public EditNode()
         {
@@ -59,7 +45,7 @@ namespace SamianDouble
             listBox3OtherNode.ValueMember = "ID";
             listBox3OtherNode.DataSource = othernods;
 
-            UpdateDataGrivTable();
+            UpdateDataGrivTable(false);
         }
 
         public struct propсмежность
@@ -119,7 +105,7 @@ namespace SamianDouble
                 return mat;
         }
 
-        private void UpdateDataGrivTable()
+        private void UpdateDataGrivTable(bool параметр)
         {
             DataTable table = new DataTable(); bool smej = false;
             int len_columns = thisnod.props[0].values.Count + 1, rows;
@@ -168,6 +154,15 @@ namespace SamianDouble
                     for (j = 1; j < len_columns; j++)
                     {
                         table.Rows[i][j] = mat[i][j - 1].prop_name;
+                    }
+                }
+                if (mat.Length >= 0 && параметр == true)
+                {
+                    table.Columns.Add("Вероятности");
+                    double[] values_p = new NodeValueMath().values_editors(mat, thisnod, tmplistnodes);
+                    for (i = 0; i < thisnod.props.Count; i++)
+                    {
+                        table.Rows[i + rows]["Вероятности"] = values_p[i];
                     }
                 }
             }
@@ -227,10 +222,10 @@ namespace SamianDouble
 
         private void EditNode_FormClosing(object sender, FormClosingEventArgs e)
         {
-            thisnod = new Nodes_struct();
+            /*thisnod = new Nodes_struct();
             thisnod_i = new int();
             tmplistnodes = new List<Nodes_struct>();
-            othernods = new List<Othernode>();
+            othernods = new List<Othernode>();*/
         }
 
         private void listBox3OtherNode_MouseDown(object sender, MouseEventArgs e)
@@ -330,7 +325,7 @@ namespace SamianDouble
             listBox2ConnectOut.ValueMember = "ID";
             listBox2ConnectOut.DataSource = thisnod.connect_out;
 
-            UpdateDataGrivTable();
+            UpdateDataGrivTable(false);
         }
 
         private void listBox2ConnectOut_DragEnter(object sender, DragEventArgs e)
@@ -392,7 +387,7 @@ namespace SamianDouble
             listBox1ConnectIn.ValueMember = "ID";
             listBox1ConnectIn.DataSource = thisnod.connects_in;
 
-            UpdateDataGrivTable();
+            UpdateDataGrivTable(false);
         }
 
         private void listBox1ConnectIn_DragEnter(object sender, DragEventArgs e)
@@ -455,13 +450,21 @@ namespace SamianDouble
                     state.Break();
                 }
             });
-
-            listBox1ConnectIn.DataSource = null;
-            listBox1ConnectIn.DisplayMember = "Name";
-            listBox1ConnectIn.ValueMember = "ID";
-            listBox1ConnectIn.DataSource = thisnod.connects_in;
-
-            UpdateDataGrivTable();
+            if (what == 1) //out
+            {
+                listBox2ConnectOut.DataSource = null;
+                listBox2ConnectOut.DisplayMember = "Name";
+                listBox2ConnectOut.ValueMember = "ID";
+                listBox2ConnectOut.DataSource = thisnod.connect_out;
+            }
+            else if (what == 2)
+            {
+                listBox1ConnectIn.DataSource = null;
+                listBox1ConnectIn.DisplayMember = "Name";
+                listBox1ConnectIn.ValueMember = "ID";
+                listBox1ConnectIn.DataSource = thisnod.connects_in;
+            }
+            UpdateDataGrivTable(false);
         }
 
         private void listBox3OtherNode_DragEnter(object sender, DragEventArgs e)
@@ -485,6 +488,11 @@ namespace SamianDouble
         {
             
         }
+
+        private void button1Math_Click(object sender, EventArgs e)
+        {
+            UpdateDataGrivTable(true);
+        }
     }
     public class Othernode
     {
@@ -500,189 +508,6 @@ namespace SamianDouble
         {
             get { return name; }
             set { name = value; }
-        }
-    }
-
-    public class UpdateNode
-    {
-        /// <summary>
-        /// возвращает переделанный нод после создания входящей связи
-        /// </summary>
-        /// <param name="list">список узлов</param>
-        /// <param name="nod">модицифируемый узел, он же возвращается</param>
-        /// <param name="id_other">ид узла связь из которого идет в текущий узел</param>
-        /// <returns>модицифированный узел</returns>
-        public List<Nodes_struct> UpdateNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
-        {
-            Nodes_struct other_nod = new Nodes_struct();
-            Parallel.For(0, list.Count, (i, state) =>
-                {
-                    if (list[i].id == id_other)
-                    {
-                        other_nod = list[i];
-                        state.Break(); //находим нужный нам нод и выходим из цикла
-                    }
-                });
-            //теперь нужно добавить связи: исходяющую связь в другой нод и в наш входяющую
-            Connect_list con = new Connect_list();
-            con.ID = other_nod.id;
-            con.Name = other_nod.name;
-            nod.connects_in.Add(con);
-
-            con = new Connect_list();
-            con.ID = nod.id;
-            con.Name = nod.name;
-            other_nod.connect_out.Add(con);
-            //связи созданы, теперь нужно добавить дополнительные свойства
-            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
-            for (int j=0;j<nod.props.Count;j++)
-            {
-                double[] vals = new double[nod.props[j].values.Count * other_nod.props.Count];
-                Parallel.For(0, vals.Length, (i, state) =>
-                    {
-                        vals[i] = 0.5;
-                    });
-                nod.props[j].values.Clear();
-                nod.props[j].values.AddRange(vals);
-            }
-            return list;
-        }
-        /// <summary>
-        /// возвращает переделанный список после создания связи исходящей связи
-        /// </summary>
-        /// <param name="list">список узлов, он же возвращается</param>
-        /// <param name="nod">модифицируемый узел</param>
-        /// <param name="id_other">ид узла в который направлена создаваемая связь</param>
-        /// <returns>модифицированный список</returns>
-        public List<Nodes_struct> UpdateNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
-        {
-            Nodes_struct other_nod = new Nodes_struct();
-            Parallel.For(0, list.Count, (i, state) =>
-            {
-                if (list[i].id == id_other)
-                {
-                    other_nod = list[i];
-                    state.Break(); //находим нужный нам нод и выходим из цикла
-                }
-            });
-            //теперь нужно добавить связи: исходяющую связь в другой нод и в наш входяющую
-            Connect_list con = new Connect_list();
-            con.ID = nod.id;
-            con.Name = nod.name; 
-            other_nod.connects_in.Add(con);
-
-            con = new Connect_list();
-            con.ID = other_nod.id;
-            con.Name = other_nod.name;
-            nod.connect_out.Add(con);
-            //связи созданы, теперь нужно добавить дополнительные свойства
-            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
-            for (int j = 0; j < other_nod.props.Count; j++)
-            {
-                //List<double> vals = nod.props[j].values; //изначальное количество и значения до увеличения значений данного свойства
-                double[] vals = new double[nod.props[j].values.Count * other_nod.props.Count];
-                Parallel.For(0, vals.Length, (i, state) =>
-                {
-                    vals[i] = 0.5;
-                });
-                other_nod.props[j].values.Clear();
-                other_nod.props[j].values.AddRange(vals);
-            }
-            return list;
-        }
-
-        public List<Nodes_struct> DeleteNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
-        {
-            int jb = 0;
-            Parallel.For(0, list.Count, (i, state) =>
-            {
-                if (list[i].id == id_other)
-                {
-                    for (int j = 0; j < list[i].connect_out.Count; j++)
-                    {
-                        if (list[i].connect_out[j].ID == nod.id)
-                        {
-                            list[i].connect_out.RemoveAt(j);
-                            jb = i;
-                            break;
-                        }
-                    }
-                    state.Break(); //находим нужный нам нод и выходим из цикла
-                }
-            });
-            //теперь нужно удалить связи: исходяющую связь в другой нод и в наш входяющую
-            Parallel.For(0, list.Count, (i, state) =>
-            {
-                if (nod.id == list[i].id)
-                {
-                    for (int j = 0; j < list[i].connects_in.Count; j++)
-                    {
-                        if (list[i].connects_in[j].ID == id_other)
-                        {
-                            nod.connects_in.RemoveAt(j);
-                            break;
-                        }
-                    }
-                    state.Break();
-                }
-            });
-            //связи удалены, теперь нужно добавить дополнительные свойства
-            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
-            for (int j = 0; j < nod.props.Count; j++)
-            {
-                List<double> vals = list[jb].props[j].values; //изначальное количество и значения до уменьшения значений данного свойства
-                int len = list[jb].props.Count;
-                int count = nod.props[j].values.Count;
-                nod.props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
-            }
-            return list;
-        }
-
-        public List<Nodes_struct> DeleteNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
-        {
-            int jb = 0;
-            Parallel.For(0, list.Count, (i, state) =>
-            {
-                if (list[i].id == id_other)
-                {
-                    for (int j = 0; j < list[i].connects_in.Count;j++ )
-                    {
-                        if (list[i].connects_in[j].ID == nod.id)
-                        {
-                            list[i].connects_in.RemoveAt(j);
-                            jb = i;
-                            break;
-                        }
-                    }
-                        state.Break(); //находим нужный нам нод и выходим из цикла
-                }
-            });
-            //теперь нужно удалить связи: исходяющую связь в другой нод и в наш входяющую
-            Parallel.For(0, list.Count, (i, state) =>
-                {
-                    if (nod.id == list[i].id)
-                    {
-                        for (int j=0;j<list[i].connect_out.Count;j++)
-                        {
-                            if (list[i].connect_out[j].ID == id_other)
-                            {
-                                list[i].connect_out.RemoveAt(j);
-                                break;
-                            }
-                        }
-                        state.Break();
-                    }
-                });
-            //связи удалены, теперь нужно добавить дополнительные свойства
-            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
-            for (int j = 0; j < list[jb].props.Count; j++)
-            {
-                List<double> vals = nod.props[j].values; //изначальное количество и значения до уменьшения значений данного свойства
-                int len = nod.props.Count;
-                int count = list[jb].props[j].values.Count;
-                list[jb].props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
-            }
-            return list;
         }
     }
 }
