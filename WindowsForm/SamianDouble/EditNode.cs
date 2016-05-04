@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace SamianDouble
 {
@@ -20,11 +22,18 @@ namespace SamianDouble
 
         private List<Nodes_struct> tmplistnodes;
 
-        public void copyDataNew(Nodes_struct n1, int i, List<Nodes_struct> nmany)
+        public void copyDataNew(/*Nodes_struct n1,*/ int k, List<Nodes_struct> nmany)
         {
-            thisnod = n1;
-            thisnod_i = i;
-            tmplistnodes = nmany;
+            tmplistnodes = new List<Nodes_struct>(nmany);
+            Parallel.For(0,nmany.Count,(j,state)=>
+                {
+                    if (tmplistnodes[j].id == k)
+                    {
+                        thisnod = tmplistnodes[j];
+                        state.Break();
+                    }
+                });
+            thisnod_i = k;
         }
 
         public EditNode()
@@ -76,23 +85,34 @@ namespace SamianDouble
                     }
                 });
             //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
-            for (int i = colrow - 1, index = 0, h = 1; i >= 0;i--,index++,h++ )
+            for (int i = colrow - 1, index = 0, h = 1; i >= 0;i--,index++)
             {
                 //цикл движется от последней строки до первой
                 //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
-                int hh = 0;
-                for (int j=0;j<colcol;j++)
+                int hh = 0; var othnod = tmplistnodes[idnodes[index]];
+                for (int j=0, ij=0;j<colcol;j++)
                 {
-                    var othnod = tmplistnodes[idnodes[index]];
+                ifigoto:
                     if (hh < h)
                     {
                         mat[i][j].id = othnod.id;
-                        mat[i][j].prop_name = othnod.props[hh].name;
+                        mat[i][j].prop_name = othnod.props[ij].name;
+                        hh++;
                     }
                     else
                     {
+                        ij++;
+                        if (ij >= othnod.props.Count)
+                            ij = 0;
                         hh = 0;
+                        goto ifigoto;
                     }
+                }
+                if (h < 2)
+                    h++;
+                else
+                {
+                    h = h * 2;
                 }
             }
             //получили верхнюю часть матрицы смежности поидее в нужном нам виде.
@@ -162,7 +182,6 @@ namespace SamianDouble
             dataGridView1.DataSource = null;
             dataGridView1.DataSource = table;
             dataGridView1.ColumnHeadersVisible = false;
-            List<Nodes_struct> dwad = MainWindow.listnodes;
         }
         /// <summary>
         /// загружает список узлов с которыми нет связи.
@@ -216,25 +235,62 @@ namespace SamianDouble
 
         private void listBox3OtherNode_MouseDown(object sender, MouseEventArgs e)
         {
-            ListBox lbl = (ListBox)sender;
-            Othernode ot = new Othernode();
-            int id = (int)listBox3OtherNode.SelectedValue;
-            string name = lbl.Text.ToString();
-            ot.id = id;
-            ot.name = name;
-            lbl.DoDragDrop(id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
+            try
+            {
+                ListBox lbl = (ListBox)sender;
+                int id = (int)listBox3OtherNode.SelectedValue;
+                string name = lbl.Text.ToString();
+                lbl.DoDragDrop("0" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+        private void listBox2ConnectOut_MouseDown(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                ListBox lbl = (ListBox)sender;
+                int id = (int)listBox2ConnectOut.SelectedValue;
+                string name = lbl.Text.ToString();
+                lbl.DoDragDrop("1" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        private void listBox1ConnectIn_MouseDown(object sender, MouseEventArgs e)
+        {
+            try
+            {
+                ListBox lbl = (ListBox)sender;
+                int id = (int)listBox1ConnectIn.SelectedValue;
+                string name = lbl.Text.ToString();
+                lbl.DoDragDrop("2" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
         }
 
         private void listBox2ConnectOut_DragDrop(object sender, DragEventArgs e)
         {
             string name = e.Data.GetData(DataFormats.Text).ToString();
+            int what = int.Parse(name.Substring(0, 1));
+            if (what == 1)
+                return;
+            name = name.Remove(0, 1);
             int id = -1;
             for (int i = 0; i < name.Length; i++)
             {
                 if (name[i] == ' ')
                 {
                     id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i);
+                    name = name.Remove(0, i+1);
                     break;
                 }
             }
@@ -285,13 +341,17 @@ namespace SamianDouble
         private void listBox1ConnectIn_DragDrop(object sender, DragEventArgs e)
         {
             string name = e.Data.GetData(DataFormats.Text).ToString();
+            int what = int.Parse(name.Substring(0, 1));
+            if (what == 2)
+                return;
+            name = name.Remove(0, 1);
             int id = -1;
             for (int i = 0; i < name.Length; i++)
             {
                 if (name[i] == ' ')
                 {
                     id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i);
+                    name = name.Remove(0, i+1);
                     break;
                 }
             }
@@ -336,6 +396,75 @@ namespace SamianDouble
         }
 
         private void listBox1ConnectIn_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Copy;
+        }
+
+        private void listBox3OtherNode_DragDrop(object sender, DragEventArgs e)
+        {
+            string name = e.Data.GetData(DataFormats.Text).ToString();
+            int id = -1, what = int.Parse(name.Substring(0, 1));
+            if (what == 0)
+                return;
+            name = name.Remove(0, 1);
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (name[i] == ' ')
+                {
+                    id = int.Parse(name.Substring(0, i));
+                    name = name.Remove(0, i+1);
+                    break;
+                }
+            }
+
+            if (what != 1 && what != 2)
+                return;
+            if (id == -1)
+                return;
+            for (int i = 0; i < othernods.Count; i++)
+            {
+                if (id == othernods[i].ID)
+                    return;
+            }
+
+            Othernode ot = new Othernode();
+            ot.ID = id;
+            ot.Name = name;
+            othernods.Add(ot);
+
+            listBox3OtherNode.DataSource = null;
+            listBox3OtherNode.DisplayMember = "Name";
+            listBox3OtherNode.ValueMember = "ID";
+            listBox3OtherNode.DataSource = othernods;
+
+            UpdateNode ap = new UpdateNode();
+            if (what == 1) //out
+            {
+                tmplistnodes = ap.DeleteNodeConnectOut(tmplistnodes, thisnod, id);
+            }
+            else if (what == 2) //in
+            {
+                tmplistnodes = ap.DeleteNodeConnectIn(tmplistnodes, thisnod, id);
+            }
+
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+            {
+                if (tmplistnodes[i].id == thisnod.id)
+                {
+                    thisnod = tmplistnodes[i];
+                    state.Break();
+                }
+            });
+
+            listBox1ConnectIn.DataSource = null;
+            listBox1ConnectIn.DisplayMember = "Name";
+            listBox1ConnectIn.ValueMember = "ID";
+            listBox1ConnectIn.DataSource = thisnod.connects_in;
+
+            UpdateDataGrivTable();
+        }
+
+        private void listBox3OtherNode_DragEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Copy;
         }
@@ -438,13 +567,13 @@ namespace SamianDouble
             });
             //теперь нужно добавить связи: исходяющую связь в другой нод и в наш входяющую
             Connect_list con = new Connect_list();
-            con.ID = other_nod.id;
-            con.Name = other_nod.name;
+            con.ID = nod.id;
+            con.Name = nod.name; 
             other_nod.connects_in.Add(con);
 
             con = new Connect_list();
-            con.ID = nod.id;
-            con.Name = nod.name;
+            con.ID = other_nod.id;
+            con.Name = other_nod.name;
             nod.connect_out.Add(con);
             //связи созданы, теперь нужно добавить дополнительные свойства
             //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
@@ -490,7 +619,7 @@ namespace SamianDouble
                     {
                         if (list[i].connects_in[j].ID == id_other)
                         {
-                            list[i].connects_in.RemoveAt(j);
+                            nod.connects_in.RemoveAt(j);
                             break;
                         }
                     }
@@ -502,12 +631,9 @@ namespace SamianDouble
             for (int j = 0; j < nod.props.Count; j++)
             {
                 List<double> vals = list[jb].props[j].values; //изначальное количество и значения до уменьшения значений данного свойства
-                int len = list[jb].props[j].values.Count;
-                for (int i = 0; i < nod.props.Count; i++)
-                {
-                    int count = nod.props[j].values.Count;
-                    nod.props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
-                }
+                int len = list[jb].props.Count;
+                int count = nod.props[j].values.Count;
+                nod.props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
             }
             return list;
         }
@@ -552,12 +678,9 @@ namespace SamianDouble
             for (int j = 0; j < list[jb].props.Count; j++)
             {
                 List<double> vals = nod.props[j].values; //изначальное количество и значения до уменьшения значений данного свойства
-                int len = nod.props[j].values.Count;
-                for (int i = 0; i < nod.props.Count; i++)
-                {
-                    int count = list[jb].props[j].values.Count;
-                    list[jb].props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
-                }
+                int len = nod.props.Count;
+                int count = list[jb].props[j].values.Count;
+                list[jb].props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
             }
             return list;
         }

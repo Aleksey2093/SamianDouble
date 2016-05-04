@@ -98,6 +98,7 @@
             this.listBox1ConnectIn.TabIndex = 0;
             this.listBox1ConnectIn.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox1ConnectIn_DragDrop);
             this.listBox1ConnectIn.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBox1ConnectIn_DragEnter);
+            this.listBox1ConnectIn.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBox1ConnectIn_MouseDown);
             // 
             // listBox2ConnectOut
             // 
@@ -110,6 +111,7 @@
             this.listBox2ConnectOut.TabIndex = 1;
             this.listBox2ConnectOut.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox2ConnectOut_DragDrop);
             this.listBox2ConnectOut.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBox2ConnectOut_DragEnter);
+            this.listBox2ConnectOut.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBox2ConnectOut_MouseDown);
             // 
             // label1
             // 
@@ -135,12 +137,15 @@
             // 
             // listBox3OtherNode
             // 
+            this.listBox3OtherNode.AllowDrop = true;
             this.listBox3OtherNode.Dock = System.Windows.Forms.DockStyle.Fill;
             this.listBox3OtherNode.FormattingEnabled = true;
             this.listBox3OtherNode.Location = new System.Drawing.Point(595, 23);
             this.listBox3OtherNode.Name = "listBox3OtherNode";
             this.listBox3OtherNode.Size = new System.Drawing.Size(292, 202);
             this.listBox3OtherNode.TabIndex = 4;
+            this.listBox3OtherNode.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox3OtherNode_DragDrop);
+            this.listBox3OtherNode.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBox3OtherNode_DragEnter);
             this.listBox3OtherNode.MouseDown += new System.Windows.Forms.MouseEventHandler(this.listBox3OtherNode_MouseDown);
             // 
             // label3

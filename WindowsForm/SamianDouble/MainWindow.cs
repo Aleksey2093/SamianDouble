@@ -17,7 +17,7 @@ namespace SamianDouble
             InitializeComponent();
         }
 
-        public static List<Nodes_struct> listnodes { get;set; }
+        public List<Nodes_struct> listnodes { get;set; }
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
@@ -109,12 +109,14 @@ namespace SamianDouble
                 int i = new Node().getSelectNode(e.Node, listnodes);
                 if (i < 0)
                     return;
-
-                ed.copyDataNew(listnodes[i], i, listnodes);
-
+                Nodes_struct[] array = new Nodes_struct[listnodes.Count];
+                listnodes.CopyTo(array);
+                array = ((Nodes_struct[])array.Clone());
+                ed.copyDataNew(i, ((Nodes_struct[])array.Clone()).ToList<Nodes_struct>());
                 ed.ShowDialog();
                 treeListReplace();
             }
         }
+
     }
 }

@@ -49,7 +49,7 @@ namespace SamianDouble
             for (int i = 0; i < list.Count; i++)
             {
                 if (new_id < list[i].id)
-                    new_id = list[i].id;
+                new_id = list[i].id;
             }
             return new_id + 1;
         }
