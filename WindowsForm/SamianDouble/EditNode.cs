@@ -53,22 +53,60 @@ namespace SamianDouble
             UpdateDataGrivTable();
         }
 
-        private string[][] getMatrixСмежность(int colrow, int colcol)
+        public struct propсмежность
         {
-            string[][] mat = new string[colrow][];
-            for (int i = 0; i < colrow; i++)
-                mat[i] = new string[colcol];
+            public int id;
+            public string prop_name;
+        }
 
+        private propсмежность[][] getMatrixСмежность(int colrow, int colcol)
+        {
+            propсмежность[][] mat = new propсмежность[colrow][];
+            List<int> idnodes = new List<int>();
+            for (int i = 0; i < colrow; i++)
+                mat[i] = new propсмежность[colcol];
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+                {
+                    for (int j=0;j<thisnod.connects_in.Count;j++)
+                    {
+                        if (thisnod.connects_in[j].ID == tmplistnodes[i].id)
+                        {
+                            idnodes.Add(i);
+                        }
+                    }
+                });
+            //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
+            for (int i = colrow - 1, index = 0, h = 1; i >= 0;i--,index++,h++ )
+            {
+                //цикл движется от последней строки до первой
+                //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
+                int hh = 0;
+                for (int j=0;j<colcol;j++)
+                {
+                    var othnod = tmplistnodes[idnodes[index]];
+                    if (hh < h)
+                    {
+                        mat[i][j].id = othnod.id;
+                        mat[i][j].prop_name = othnod.props[hh].name;
+                    }
+                    else
+                    {
+                        hh = 0;
+                    }
+                }
+            }
+            //получили верхнюю часть матрицы смежности поидее в нужном нам виде.
                 return mat;
         }
 
         private void UpdateDataGrivTable()
         {
-            DataTable table = new DataTable();
+            DataTable table = new DataTable(); bool smej = false;
             int len_columns = thisnod.props[0].values.Count + 1, rows;
             try
             {
                 rows = thisnod.props.Count + thisnod.connects_in.Count;
+                smej = true;
             }
             catch
             {
@@ -102,6 +140,17 @@ namespace SamianDouble
             }
             //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
             rows = rows - thisnod.props.Count;
+            if (smej && thisnod.connects_in.Count > 0)
+            {
+                propсмежность[][] mat = getMatrixСмежность(rows, len_columns - 1);
+                for (i = 0;i<rows;i++)
+                {
+                    for (j = 1; j < len_columns; j++)
+                    {
+                        table.Rows[i][j] = mat[i][j - 1].prop_name;
+                    }
+                }
+            }
             for (i = 0; i < thisnod.props.Count;i++ )
             {
                 for (j=0;j<thisnod.props[i].values.Count;j++)
@@ -159,6 +208,7 @@ namespace SamianDouble
         {
             thisnod = null;
             thisnod_i = -1;
+            tmplistnodes = null;
             othernods = null;
         }
 
@@ -194,14 +244,6 @@ namespace SamianDouble
             for (int i = 0; i < thisnod.connects_in.Count; i++)
                 if (id == thisnod.connects_in[i].ID)
                     return;
-            Connect_list cl = new Connect_list();
-            cl.conid = id;
-            cl.connodename = name;
-            thisnod.connect_out.Add(cl);
-            listBox2ConnectOut.DataSource = null;
-            listBox2ConnectOut.DisplayMember = "Name";
-            listBox2ConnectOut.ValueMember = "ID";
-            listBox2ConnectOut.DataSource = thisnod.connect_out;
             for (int i=0;i<othernods.Count;i++)
                 if (id == othernods[i].ID)
                 {
@@ -215,6 +257,20 @@ namespace SamianDouble
 
             UpdateNode ap = new UpdateNode();
             tmplistnodes = ap.UpdateNodeConnectOut(tmplistnodes, thisnod, id);
+
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+                {
+                    if (tmplistnodes[i].id == thisnod.id)
+                    {
+                        thisnod = tmplistnodes[i];
+                        state.Break();
+                    }
+                });
+
+            listBox2ConnectOut.DataSource = null;
+            listBox2ConnectOut.DisplayMember = "Name";
+            listBox2ConnectOut.ValueMember = "ID";
+            listBox2ConnectOut.DataSource = thisnod.connect_out;
 
             UpdateDataGrivTable();
         }
@@ -245,15 +301,7 @@ namespace SamianDouble
             for (int i = 0; i < thisnod.connects_in.Count; i++)
                 if (id == thisnod.connects_in[i].ID)
                     return;
-            Connect_list cl = new Connect_list();
-            cl.conid = id;
-            cl.connodename = name;
-            thisnod.connect_out.Add(cl);
 
-            listBox1ConnectIn.DataSource = null;
-            listBox1ConnectIn.DisplayMember = "Name";
-            listBox1ConnectIn.ValueMember = "ID";
-            listBox1ConnectIn.DataSource = thisnod.connects_in;
             for (int i = 0; i < othernods.Count; i++)
                 if (id == othernods[i].ID)
                 {
@@ -266,7 +314,21 @@ namespace SamianDouble
             listBox3OtherNode.DataSource = othernods;
 
             UpdateNode ap = new UpdateNode();
-            thisnod = ap.UpdateNodeConnectIn(tmplistnodes, thisnod, id);
+            tmplistnodes = ap.UpdateNodeConnectIn(tmplistnodes, thisnod, id);
+
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+            {
+                if (tmplistnodes[i].id == thisnod.id)
+                {
+                    thisnod = tmplistnodes[i];
+                    state.Break();
+                }
+            });
+
+            listBox1ConnectIn.DataSource = null;
+            listBox1ConnectIn.DisplayMember = "Name";
+            listBox1ConnectIn.ValueMember = "ID";
+            listBox1ConnectIn.DataSource = thisnod.connects_in;
 
             UpdateDataGrivTable();
         }
@@ -302,27 +364,40 @@ namespace SamianDouble
         /// <param name="nod">модицифируемый узел, он же возвращается</param>
         /// <param name="id_other">ид узла связь из которого идет в текущий узел</param>
         /// <returns>модицифированный узел</returns>
-        public Nodes_struct UpdateNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        public List<Nodes_struct> UpdateNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
         {
             Nodes_struct other_nod = new Nodes_struct();
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].id == id_other)
+            Parallel.For(0, list.Count, (i, state) =>
                 {
-                    other_nod = list[i];
-                    break;
-                }
-            }
+                    if (list[i].id == id_other)
+                    {
+                        other_nod = list[i];
+                        state.Break(); //находим нужный нам нод и выходим из цикла
+                    }
+                });
+            //теперь нужно добавить связи: исходяющую связь в другой нод и в наш входяющую
+            Connect_list con = new Connect_list();
+            con.ID = other_nod.id;
+            con.Name = other_nod.name;
+            nod.connects_in.Add(con);
 
-            for (int i = 0; i < nod.props.Count; i++)
+            con = new Connect_list();
+            con.ID = nod.id;
+            con.Name = nod.name;
+            other_nod.connect_out.Add(con);
+            //связи созданы, теперь нужно добавить дополнительные свойства
+            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
+            for (int j=0;j<nod.props.Count;j++)
             {
-                for (int j=0;j<other_nod.props.Count*nod.props[i].values.Count;j++)
-                {
-                    nod.props[i].values.Add(0.5);
-                }
+                double[] vals = new double[nod.props[j].values.Count * other_nod.props.Count];
+                Parallel.For(0, vals.Length, (i, state) =>
+                    {
+                        vals[i] = 0.5;
+                    });
+                nod.props[j].values.Clear();
+                nod.props[j].values.AddRange(vals);
             }
-
-            return nod;
+            return list;
         }
         /// <summary>
         /// возвращает переделанный список после создания связи исходящей связи
@@ -334,23 +409,34 @@ namespace SamianDouble
         public List<Nodes_struct> UpdateNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
         {
             Nodes_struct other_nod = new Nodes_struct();
-            for (int i = 0; i < list.Count; i++)
+            Parallel.For(0, list.Count, (i, state) =>
             {
                 if (list[i].id == id_other)
                 {
                     other_nod = list[i];
-                    break;
+                    state.Break(); //находим нужный нам нод и выходим из цикла
                 }
-            }
+            });
+            //теперь нужно добавить связи: исходяющую связь в другой нод и в наш входяющую
+            Connect_list con = new Connect_list();
+            con.ID = other_nod.id;
+            con.Name = other_nod.name;
+            other_nod.connects_in.Add(con);
 
-            for (int i = 0; i < nod.props.Count; i++)
+            con = new Connect_list();
+            con.ID = nod.id;
+            con.Name = nod.name;
+            nod.connect_out.Add(con);
+            //связи созданы, теперь нужно добавить дополнительные свойства
+            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
+            for (int j = 0; j < other_nod.props.Count; j++)
             {
-                for (int j = 0; j < other_nod.props.Count * nod.props[i].values.Count; j++)
+                List<double> vals = nod.props[j].values; //изначальное количество и значения до увеличения значений данного свойства
+                for (int i = 0; i < nod.props.Count; i++)
                 {
-                    nod.props[i].values.Add(0.5);
+                    other_nod.props[j].values.AddRange(vals); // на этом шаге увеличиваем в два раза количество значений
                 }
             }
-
             return list;
         }
     }
