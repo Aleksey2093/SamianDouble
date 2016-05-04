@@ -108,6 +108,9 @@ namespace SamianDouble
         private void UpdateDataGrivTable(bool параметр)
         {
             DataTable table = new DataTable(); bool smej = false;
+            dataGridView1.DataSource = null;
+            dataGridView1.DataSource = table;
+            dataGridView1.ColumnHeadersVisible = false;
             int len_columns = thisnod.props[0].values.Count + 1, rows;
             try
             {
@@ -137,12 +140,16 @@ namespace SamianDouble
                 }
                 table.Rows.Add();
                 table.Rows[i][0] = list[id].name;
+                dataGridView1.Rows[i].Cells[0].ReadOnly = true;
+                dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.Red;
             }
             int j = 0;
             for (i = i + 0, j = 0; i < rows; i++, j++)
             {
                 table.Rows.Add();
                 table.Rows[i][0] = thisnod.props[j].name;
+                dataGridView1.Rows[i].Cells[0].ReadOnly = true;
+                dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.LightGreen;
             }
             //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
             rows = rows - thisnod.props.Count;
@@ -154,6 +161,8 @@ namespace SamianDouble
                     for (j = 1; j < len_columns; j++)
                     {
                         table.Rows[i][j] = mat[i][j - 1].prop_name;
+                        dataGridView1.Rows[i].Cells[j].ReadOnly = true;
+                        dataGridView1.Rows[i].Cells[j].Style.BackColor = Color.LightBlue;
                     }
                 }
                 if (mat.Length >= 0 && параметр == true)
@@ -173,10 +182,6 @@ namespace SamianDouble
                     table.Rows[i + rows][j + 1] = thisnod.props[i].values[j];
                 }
             }
-
-            dataGridView1.DataSource = null;
-            dataGridView1.DataSource = table;
-            dataGridView1.ColumnHeadersVisible = false;
         }
         /// <summary>
         /// загружает список узлов с которыми нет связи.

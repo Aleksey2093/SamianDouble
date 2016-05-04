@@ -120,5 +120,69 @@ namespace SamianDouble
             }
         }
 
+        private void treeView1_MouseDown(object sender, MouseEventArgs e)
+        {
+            
+        }
+
+        private void treeView1_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Button == System.Windows.Forms.MouseButtons.Right)
+            {
+                e.Node.BackColor = Color.Red;
+                /*
+                 *             TreeNode n1 = new TreeNode("Родители");
+            TreeNode n2 = new TreeNode("Промежуточные");
+            TreeNode n3 = new TreeNode("Дети");
+            TreeNode n4 = new TreeNode("Несвязные");
+                 */
+                int index = new Node().getSelectNode(e.Node, listnodes);
+                for (int i=0;i<treeView1.Nodes[0].Nodes.Count;i++)
+                {
+                    for (int j=0;j<listnodes[index].connects_in.Count;j++)
+                    {
+                        var tr = treeView1.Nodes[0].Nodes[i];
+                        var ln = listnodes[index].connects_in[j];
+                        if (tr.Name == ln.ID.ToString()+ln.Name)
+                        {
+                            tr.BackColor = Color.LightBlue;
+                        }
+                    }
+                }
+                for (int i = 0; i < treeView1.Nodes[1].Nodes.Count; i++)
+                {
+                    for (int j = 0; j < listnodes[index].connects_in.Count; j++)
+                    {
+                        var tr = treeView1.Nodes[1].Nodes[i];
+                        var ln = listnodes[index].connects_in[j];
+                        if (tr.Name == ln.ID.ToString() + ln.Name)
+                        {
+                            tr.BackColor = Color.LightBlue;
+                        }
+                    }
+                    for (int j = 0; j < listnodes[index].connect_out.Count; j++)
+                    {
+                        var tr = treeView1.Nodes[1].Nodes[i];
+                        var ln = listnodes[index].connect_out[j];
+                        if (tr.Name == ln.ID.ToString() + ln.Name)
+                        {
+                            tr.BackColor = Color.LightGreen;
+                        }
+                    }
+                }
+                for (int i = 0; i < treeView1.Nodes[2].Nodes.Count; i++)
+                {
+                    for (int j = 0; j < listnodes[index].connect_out.Count; j++)
+                    {
+                        var tr = treeView1.Nodes[2].Nodes[i];
+                        var ln = listnodes[index].connect_out[j];
+                        if (tr.Name == ln.ID.ToString() + ln.Name)
+                        {
+                            tr.BackColor = Color.LightGreen;
+                        }
+                    }
+                }
+            }
+        }
     }
 }
