@@ -235,6 +235,7 @@ namespace SamianDouble
         private void EditNode_FormClosing(object sender, FormClosingEventArgs e)
         {
             thisnod.name = textBox1.Text;
+            Сохр_таблицу_в_узел();
         }
 
         private void listBox3OtherNode_MouseDown(object sender, MouseEventArgs e)

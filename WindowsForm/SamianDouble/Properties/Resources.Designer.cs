@@ -59,5 +59,25 @@ namespace SamianDouble.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
+        /// </summary>
+        internal static System.Drawing.Icon bejeweled {
+            get {
+                object obj = ResourceManager.GetObject("bejeweled", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Icon, аналогичного (Значок).
+        /// </summary>
+        internal static System.Drawing.Icon bug {
+            get {
+                object obj = ResourceManager.GetObject("bug", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
     }
 }

@@ -28,10 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Родители");
-            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Промежуточные");
-            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Дети");
-            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Несвязные");
+            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Родители");
+            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Промежуточные");
+            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Дети");
+            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Несвязные");
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button_AddNode = new System.Windows.Forms.Button();
@@ -125,19 +126,19 @@
             this.treeView1.LabelEdit = true;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            treeNode1.Name = "Узел0";
-            treeNode1.Text = "Родители";
-            treeNode2.Name = "Узел1";
-            treeNode2.Text = "Промежуточные";
-            treeNode3.Name = "Узел2";
-            treeNode3.Text = "Дети";
-            treeNode4.Name = "Узел3";
-            treeNode4.Text = "Несвязные";
+            treeNode5.Name = "Узел0";
+            treeNode5.Text = "Родители";
+            treeNode6.Name = "Узел1";
+            treeNode6.Text = "Промежуточные";
+            treeNode7.Name = "Узел2";
+            treeNode7.Text = "Дети";
+            treeNode8.Name = "Узел3";
+            treeNode8.Text = "Несвязные";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode1,
-            treeNode2,
-            treeNode3,
-            treeNode4});
+            treeNode5,
+            treeNode6,
+            treeNode7,
+            treeNode8});
             this.treeView1.Size = new System.Drawing.Size(260, 401);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_AfterLabelEdit);
@@ -193,6 +194,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1106, 469);
             this.Controls.Add(this.tableLayoutPanel1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainWindow";
             this.Text = "Главное окно";
