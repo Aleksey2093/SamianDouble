@@ -175,7 +175,7 @@ namespace SamianDouble
                 if (mat.Length >= 0 && параметр == true)
                 {
                     table.Columns.Add("Вероятности");
-                    double[] values_p = new NodeValueMath().values_editors(mat, thisnod, tmplistnodes);
+                    double[] values_p = new NodeValueMathDown().values_editors(mat, thisnod, tmplistnodes);
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
                         table.Rows[i + rows]["Вероятности"] = Math.Round(values_p[i], 2);

@@ -62,9 +62,12 @@
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="NodeValueMathDown.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="NodeValueMathUp.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UpdateNode.cs" />
     <EmbeddedResource Include="EditNode.resx">
       <DependentUpon>EditNode.cs</DependentUpon>
     </EmbeddedResource>
