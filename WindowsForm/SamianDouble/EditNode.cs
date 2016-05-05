@@ -307,11 +307,11 @@ namespace SamianDouble
                 {
                     if (what == 1) //out
                     {
-                        tmplistnodes = ap.DeleteNodeConnectOut(tmplistnodes, thisnod, id);
+                        tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
                     }
                     else if (what == 2) //in
                     {
-                        tmplistnodes = ap.DeleteNodeConnectIn(tmplistnodes, thisnod, id);
+                        tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
                     }
 
                     Parallel.For(0, tmplistnodes.Count, (j, state) =>
@@ -353,7 +353,7 @@ namespace SamianDouble
             listBox3OtherNode.ValueMember = "ID";
             listBox3OtherNode.DataSource = othernods;
 
-            tmplistnodes = ap.UpdateNodeConnectOut(tmplistnodes, thisnod, id);
+            tmplistnodes = ap.updateNodeConnectOut(tmplistnodes, thisnod, id);
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
                 {
@@ -402,11 +402,11 @@ namespace SamianDouble
                 {
                     if (what == 1) //out
                     {
-                        tmplistnodes = ap.DeleteNodeConnectOut(tmplistnodes, thisnod, id);
+                        tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
                     }
                     else if (what == 2) //in
                     {
-                        tmplistnodes = ap.DeleteNodeConnectIn(tmplistnodes, thisnod, id);
+                        tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
                     }
 
                     Parallel.For(0, tmplistnodes.Count, (j, state) =>
@@ -449,7 +449,7 @@ namespace SamianDouble
             listBox3OtherNode.ValueMember = "ID";
             listBox3OtherNode.DataSource = othernods;
 
-            tmplistnodes = ap.UpdateNodeConnectIn(tmplistnodes, thisnod, id);
+            tmplistnodes = ap.updateNodeConnectIn(tmplistnodes, thisnod, id);
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
             {
@@ -513,11 +513,11 @@ namespace SamianDouble
             UpdateNode ap = new UpdateNode();
             if (what == 1) //out
             {
-                tmplistnodes = ap.DeleteNodeConnectOut(tmplistnodes, thisnod, id);
+                tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
             }
             else if (what == 2) //in
             {
-                tmplistnodes = ap.DeleteNodeConnectIn(tmplistnodes, thisnod, id);
+                tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
             }
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>

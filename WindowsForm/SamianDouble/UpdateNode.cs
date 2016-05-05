@@ -18,7 +18,7 @@ namespace SamianDouble
         /// <param name="nod">модицифируемый узел, он же возвращается</param>
         /// <param name="id_other">ид узла связь из которого идет в текущий узел</param>
         /// <returns>модицифированный узел</returns>
-        public List<Nodes_struct> UpdateNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        public List<Nodes_struct> updateNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
         {
             Nodes_struct other_nod = new Nodes_struct();
             Parallel.For(0, list.Count, (i, state) =>
@@ -60,7 +60,7 @@ namespace SamianDouble
         /// <param name="nod">модифицируемый узел</param>
         /// <param name="id_other">ид узла в который направлена создаваемая связь</param>
         /// <returns>модифицированный список</returns>
-        public List<Nodes_struct> UpdateNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        public List<Nodes_struct> updateNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
         {
             Nodes_struct other_nod = new Nodes_struct();
             Parallel.For(0, list.Count, (i, state) =>
@@ -104,7 +104,7 @@ namespace SamianDouble
         /// <param name="nod">текущий узел</param>
         /// <param name="id_other">ид узла с которым разорвана связь</param>
         /// <returns></returns>
-        public List<Nodes_struct> DeleteNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        public List<Nodes_struct> deleteNodeConnectIn(List<Nodes_struct> list, Nodes_struct nod, int id_other)
         {
             int jb = 0;
             Parallel.For(0, list.Count, (i, state) =>
@@ -157,7 +157,7 @@ namespace SamianDouble
         /// <param name="nod">текущий узел</param>
         /// <param name="id_other">ид узла с которым разорвана связь</param>
         /// <returns></returns>
-        public List<Nodes_struct> DeleteNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        public List<Nodes_struct> deleteNodeConnectOut(List<Nodes_struct> list, Nodes_struct nod, int id_other)
         {
             int jb = 0;
             Parallel.For(0, list.Count, (i, state) =>
@@ -202,6 +202,71 @@ namespace SamianDouble
                 list[jb].props[j].values.RemoveRange(count / len, count - count / len); // на этом шаге уменьшаем в два раза количество значений
             }
             return list;
+        }
+
+        public bool provConnЦикличность(List<Nodes_struct> list, Nodes_struct nod, int id_other)
+        {
+            List<int[]> conns = new List<int[]>();
+            {
+            int[] con1 = new int[2];
+            if (nod.id > id_other)
+            {
+                con1[1] = nod.id;
+                con1[0] = id_other;
+            }
+            else
+            {
+                con1[0] = nod.id;
+                con1[1] = id_other;
+            }
+            conns.Add(con1);
+            }
+            Parallel.ForEach(list, (n1, state) =>
+                {
+                    Parallel.ForEach(nod.connects_in, (c1, statec1) =>
+                        {
+                            int[] con = new int[2];
+                            if (n1.id > c1.ID)
+                            {
+                                con[1] = n1.id;
+                                con[0] = c1.ID;
+                            }
+                            else
+                            {
+                                con[0] = n1.id;
+                                con[1] = c1.ID;
+                            }
+                        });
+                    Parallel.ForEach(nod.connect_out, (c2, statec2) =>
+                    {
+                        int[] con = new int[2];
+                        if (n1.id > c2.ID)
+                        {
+                            con[1] = n1.id;
+                            con[0] = c2.ID;
+                        }
+                        else
+                        {
+                            con[0] = n1.id;
+                            con[1] = c2.ID;
+                        }
+                    });
+                });
+            for (int i = 0; i < conns.Count-1;i++ )
+            {
+                for (int j=i+1;j<conns.Count;j++)
+                {
+                    if (conns[i] == conns[j] && i != j)
+                    {
+                        conns.RemoveAt(j);
+                        j--;
+                    }
+                }
+            }
+            /*пройтись по полученном циклу и если он зацикливается то это плохо.
+            вычислить максимально возможное количество подключений для данного количества 
+            узлов и сравнивать с этим числом если что когда буду проходить по связи одного узла вглубь*/
+            return true;
         }
     }
 }
