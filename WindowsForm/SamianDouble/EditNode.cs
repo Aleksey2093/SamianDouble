@@ -112,6 +112,34 @@ namespace SamianDouble
             return mat;
         }
 
+        public struct GridCellColor
+        {
+            private int r;
+            private int c;
+            private Color colorback;
+            public bool setvalue(int i, int j, Color color)
+            {
+                r = i;
+                c = j;
+                colorback = color;
+                return true;
+            }
+            public int rows
+            {
+                get {
+                    return r;
+                }
+            }
+            public int cell
+            {
+                get {return c;}
+            }
+            public Color color
+            {
+                get { return colorback; }
+            }
+        };
+
         private void UpdateDataGrivTable(bool параметр)
         {
             DataTable table = new DataTable(); bool smej = false;
@@ -128,6 +156,7 @@ namespace SamianDouble
             {
                 rows = thisnod.props.Count;
             }
+            GridCellColor[,] gridcell = new GridCellColor[rows, len_columns + 1];
             int i = 0;
             List<Nodes_struct> list = tmplistnodes;
             for (i = 0; i < len_columns; i++)
@@ -148,6 +177,7 @@ namespace SamianDouble
                 table.Rows.Add();
                 table.Rows[i][0] = list[id].name;
                 dataGridView1.Rows[i].Cells[0].ReadOnly = true;
+                gridcell[i, 0].setvalue(i, 0, Color.Red);
                 dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.Red;
             }
             int j = 0;
@@ -156,6 +186,7 @@ namespace SamianDouble
                 table.Rows.Add();
                 table.Rows[i][0] = thisnod.props[j].name;
                 dataGridView1.Rows[i].Cells[0].ReadOnly = true;
+                gridcell[i, 0].setvalue(i, 0, Color.LightGreen);
                 dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.LightGreen;
             }
             //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
@@ -169,6 +200,7 @@ namespace SamianDouble
                     {
                         table.Rows[i][j] = mat[i][j - 1].prop_name;
                         dataGridView1.Rows[i].Cells[j].ReadOnly = true;
+                        gridcell[i, j].setvalue(i, j, Color.LightBlue);
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = Color.LightBlue;
                     }
                 }
@@ -178,8 +210,14 @@ namespace SamianDouble
                     double[] values_p = new NodeValueMathDown().values_editors(mat, thisnod, tmplistnodes);
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
+                        gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose);
                         table.Rows[i + rows]["Вероятности"] = Math.Round(values_p[i], 2);
                     }
+                    for (i = 0; i < table.Rows.Count; i++)
+                        for (j = 0; j < table.Columns.Count; j++)
+                        {
+                            dataGridView1.Rows[i].Cells[j].Style.BackColor = gridcell[i, j].color;
+                        }
                 }
             }
             for (i = 0; i < thisnod.props.Count; i++)

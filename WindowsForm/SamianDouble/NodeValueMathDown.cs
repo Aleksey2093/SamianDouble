@@ -53,7 +53,6 @@ namespace SamianDouble
                 }
                 values[i] = Math.Round(values[i], 4);
                 nod.props[i].value_editor = values[i];
-
             }
             return values;
         }
