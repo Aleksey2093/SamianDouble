@@ -217,6 +217,9 @@ namespace SamianDouble
                 Node n = new Node();
                 listnodes = n.nodeDeletePropertyThisNod(nod, listnodes);
                 treeListReplace();
+            } else if (e.Button == MouseButtons.Left && e.Node.Level == 2)
+            {
+
             }
         }
 

@@ -115,28 +115,38 @@ namespace SamianDouble
         {
             if (nod.Level == 1)
             {
-                for (int i = 0; i < list.Count; i++)
-                    if ((list[i].id.ToString() + list[i].name) == nod.Name)
+                Parallel.ForEach(list,(nownod,state)=>
+                {
+                    if ((nownod.id.ToString() + nownod.name) == nod.Name)
                     {
                         Propertys_struct pr = new Propertys_struct();
-                        pr.name = "Props" + (1+list[i].props.Count);
+                        pr.name = "Props" + (1 + nownod.props.Count);
                         pr.values = new List<double>();
-                        Parallel.ForEach(list[i].props[0].values, (val) =>
+                        Parallel.ForEach(nownod.props[0].values, (val) =>
                             {
                                 pr.values.Add(0);
                             });
-                        list[i].props.Add(pr);
-                        return list;
+                        nownod.props.Add(pr);
+                        state.Break();
                     }
+                });
             }
             return list;
         }
         public int getSelectNode(TreeNode nod, List<Nodes_struct> list)
         {
-            for (int i = 0; i < list.Count; i++)
+            int idвлист = -1;
+            Parallel.For(0,list.Count, (i, state) =>
+            {
                 if ((list[i].id.ToString() + list[i].name) == nod.Name)
-                    return i;
-            return -1;
+                {
+                    idвлист = i;
+                    state.Break();
+                }
+            });
+            if (idвлист == -1)
+                MessageBox.Show("Ошибка поиска ид");
+            return idвлист;
         }
         /// <summary>
         /// возвращает список в котором удалено свойство текущего узла
@@ -161,14 +171,54 @@ namespace SamianDouble
                         state.Break();
                     }
                 });
-
             return listnodes;
         }
+
+        public List<Nodes_struct> nodeFixPropertyThisNod(TreeNode nod, List<Nodes_struct> listnodes, bool ifi1)
+        {
+            bool ifi2 = !ifi1;
+            Parallel.ForEach(listnodes, (nodlist, state) =>
+            {
+                if (nodlist.id.ToString() + nodlist.name == nod.Parent.Name)
+                {
+                    Parallel.For(0, nodlist.props.Count, (i, stateдва) =>
+                    {
+                        if (nodlist.props[i].name == nod.Text)
+                        {
+                            nodlist.props[i].proc100 = ifi1;
+                            stateдва.Break();
+                        }
+                        else
+                        {
+                            nodlist.props[i].proc100 = ifi2;
+                        }
+                    });
+                    state.Break();
+                }
+            });
+            return listnodes;
+        }
+
+        public Nodes_struct getNodeПоИд(List<Nodes_struct> list, int id)
+        {
+            Nodes_struct nod = new Nodes_struct();
+
+            Parallel.ForEach(list, (nodтекущий, state) =>
+                {
+                    if (nodтекущий.id == id)
+                    {
+                        nod = nodтекущий;
+                        state.Break();
+                    }
+                });
+            return nod;
+        }
+
         /// <summary>
         /// Возвращает вариант ответа:
         /// 0 - ничего нет
-        /// 1 - есть узлы с пометкой известный, но не текущий
-        /// 2 - есть узлы с пометкой известный, текущий тоже известен
+        /// 1 - есть узлы с пометкой известный среди детей, но не текущий
+        /// 2 - есть узлы с пометкой известный среди детей, текущий тоже известен
         /// 3 - текущий известен остальные нет
         /// </summary>
         /// <param name="list">список узлов</param>
@@ -181,16 +231,28 @@ namespace SamianDouble
                 {
                     if (nod.id != nownod.id)
                     {
-                        Parallel.ForEach(nod.props, (свойство, stateсвойство) =>
+                        bool child = false;
+                        Parallel.ForEach(nownod.connect_out, (связь, stateсвязь) =>
                             {
-                                if (свойство.proc100 == true)
+                                if (связь.ID == nod.id)
                                 {
-                                    res = 1; //изсвестные есть
-                                    stateсвойство.Break();
+                                    child = true;
+                                    stateсвязь.Break();
                                 }
                             });
-                        if (res == 1)
-                            stateузлы.Break();
+                        if (child)
+                        {
+                            Parallel.ForEach(nod.props, (свойство, stateсвойство) =>
+                                {
+                                    if (свойство.proc100 == true)
+                                    {
+                                        res = 1; //изсвестные есть
+                                        stateсвойство.Break();
+                                    }
+                                });
+                            if (res == 1)
+                                stateузлы.Break();
+                        }
                     }
                 });
             Parallel.ForEach(nownod.props, (свойство, stateсвойство) =>
