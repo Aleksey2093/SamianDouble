@@ -10,15 +10,26 @@ using System.Windows.Forms;
 
 namespace SamianDouble
 {
-    public class Nodes_struct
+    public class Node_struct
     {
-        public int id;
-        public string name;
+        private int id;
+        private string name;
         public List<Propertys_struct> props;
-        public List<Connect_list> connects_in;
-        public List<Connect_list> connect_out;
+        public List<Node_struct> connects_in;
+        public List<Node_struct> connects_out;
+
+        public int ID
+        {
+            get { return id; }
+            set { id = value; }
+        }
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
     }
-    public class Connect_list
+    /*public class Connect_list
     {
         public int conid;
         public string connodename;
@@ -32,7 +43,7 @@ namespace SamianDouble
             get { return connodename; }
             set { connodename = value; }
         }
-    }
+    }*/
     public class Propertys_struct
     {
         public String name;
@@ -42,22 +53,22 @@ namespace SamianDouble
     }
     class Node
     {
-        public int get_new_id(List<Nodes_struct> list)
+        public int get_new_id(List<Node_struct> list)
         {
             int new_id = -1;
 
             for (int i = 0; i < list.Count; i++)
             {
-                if (new_id < list[i].id)
-                new_id = list[i].id;
+                if (new_id < list[i].ID)
+                new_id = list[i].ID;
             }
             return new_id + 1;
         }
-        public List<Nodes_struct> getNewNode(List<Nodes_struct> list)
+        public List<Node_struct> getNewNode(List<Node_struct> list)
         {
-            Nodes_struct nod = new Nodes_struct();
-            nod.id = get_new_id(list);
-            nod.name = "New Node " + nod.id;
+            Node_struct nod = new Node_struct();
+            nod.ID = get_new_id(list);
+            nod.Name = "New Node " + nod.ID;
             nod.props = new List<Propertys_struct>();
 
             Propertys_struct p_s = new Propertys_struct();
@@ -74,28 +85,28 @@ namespace SamianDouble
             p_s.values.Add(0.5);
             nod.props.Add(p_s);
 
-            nod.connect_out = new List<Connect_list>();
-            nod.connects_in = new List<Connect_list>();
+            nod.connects_out = new List<Node_struct>();
+            nod.connects_in = new List<Node_struct>();
 
             list.Add(nod);
             return list;
         }
-        public bool provNewNameBool(List<Nodes_struct> list, String name)
+        public bool provNewNameBool(List<Node_struct> list, String name)
         {
             for (int i = 0; i < list.Count; i++)
-                if (list[i].name == name)
+                if (list[i].Name == name)
                     return true;
             return false;
         }
-        public List<Nodes_struct> nodeNameEdit(TreeNode nod, List<Nodes_struct> list)
+        public List<Node_struct> nodeNameEdit(TreeNode nod, List<Node_struct> list)
         {
             //узнаем, что мы изменили свойство или название самого узла
             if (nod.Level == 1)
             {
                 for (int i = 0; i < list.Count; i++)
-                    if ((list[i].id.ToString() + list[i].name) == nod.Name)
+                    if ((list[i].ID.ToString() + list[i].Name) == nod.Name)
                     {
-                        list[i].name = nod.Text;
+                        list[i].Name = nod.Text;
                         return list;
                     }
             }
@@ -103,7 +114,7 @@ namespace SamianDouble
             {
                 for (int i = 0; i < list.Count; i++)
                     for (int j = 0; j < list[i].props.Count; j++)
-                        if ((list[i].id.ToString() + list[i].props[j].name) == nod.Name)
+                        if ((list[i].ID.ToString() + list[i].props[j].name) == nod.Name)
                         {
                             list[i].props[j].name = nod.Text;
                             return list;
@@ -111,13 +122,13 @@ namespace SamianDouble
             }
             return list;
         }
-        public List<Nodes_struct> nodeAddNewProperty(TreeNode nod, List<Nodes_struct> list)
+        public List<Node_struct> nodeAddNewProperty(TreeNode nod, List<Node_struct> list)
         {
             if (nod.Level == 1)
             {
                 Parallel.ForEach(list,(nownod,state)=>
                 {
-                    if ((nownod.id.ToString() + nownod.name) == nod.Name)
+                    if ((nownod.ID.ToString() + nownod.Name) == nod.Name)
                     {
                         Propertys_struct pr = new Propertys_struct();
                         pr.name = "Props" + (1 + nownod.props.Count);
@@ -133,12 +144,12 @@ namespace SamianDouble
             }
             return list;
         }
-        public int getSelectNode(TreeNode nod, List<Nodes_struct> list)
+        public int getSelectNode(TreeNode nod, List<Node_struct> list)
         {
             int idвлист = -1;
             Parallel.For(0,list.Count, (i, state) =>
             {
-                if ((list[i].id.ToString() + list[i].name) == nod.Name)
+                if ((list[i].ID.ToString() + list[i].Name) == nod.Name)
                 {
                     idвлист = i;
                     state.Break();
@@ -154,11 +165,11 @@ namespace SamianDouble
         /// <param name="nod">узел с дерева treeview</param>
         /// <param name="listnodes">список узлов</param>
         /// <returns></returns>
-        public List<Nodes_struct> nodeDeletePropertyThisNod(TreeNode nod, List<Nodes_struct> listnodes)
+        public List<Node_struct> nodeDeletePropertyThisNod(TreeNode nod, List<Node_struct> listnodes)
         {
             Parallel.ForEach(listnodes, (nodlist, state) =>
                 {
-                    if (nodlist.id.ToString()+nodlist.name == nod.Parent.Name)
+                    if (nodlist.ID.ToString() + nodlist.Name == nod.Parent.Name)
                     {
                         Parallel.For(0,nodlist.props.Count, (i, stateдва) =>
                             {
@@ -174,12 +185,23 @@ namespace SamianDouble
             return listnodes;
         }
 
-        public List<Nodes_struct> nodeFixPropertyThisNod(TreeNode nod, List<Nodes_struct> listnodes, bool ifi1)
+        public List<Node_struct> nodeFixPropertyThisNod(TreeNode nod, List<Node_struct> listnodes)
         {
-            bool ifi2 = !ifi1;
+            bool ifi1;
+            bool ifi2;
+            if (nod.BackColor != Color.Tomato)
+            {
+                ifi1 = true;
+                ifi2 = false;
+            }
+            else
+            {
+                ifi1 = false;
+                ifi2 = false;
+            }
             Parallel.ForEach(listnodes, (nodlist, state) =>
             {
-                if (nodlist.id.ToString() + nodlist.name == nod.Parent.Name)
+                if (nodlist.ID.ToString() + nodlist.Name == nod.Parent.Name)
                 {
                     Parallel.For(0, nodlist.props.Count, (i, stateдва) =>
                     {
@@ -199,13 +221,19 @@ namespace SamianDouble
             return listnodes;
         }
 
-        public Nodes_struct getNodeПоИд(List<Nodes_struct> list, int id)
+        /// <summary>
+        /// получить нод по ид
+        /// </summary>
+        /// <param name="list">список узлов</param>
+        /// <param name="id">ид искомого узла</param>
+        /// <returns>Node_struct</returns>
+        public Node_struct getNodeПоИд(List<Node_struct> list, int id)
         {
-            Nodes_struct nod = new Nodes_struct();
+            Node_struct nod = null;
 
             Parallel.ForEach(list, (nodтекущий, state) =>
                 {
-                    if (nodтекущий.id == id)
+                    if (nodтекущий.ID == id)
                     {
                         nod = nodтекущий;
                         state.Break();
@@ -224,17 +252,17 @@ namespace SamianDouble
         /// <param name="list">список узлов</param>
         /// <param name="nod">текущий узел</param>
         /// <returns>int</returns>
-        public int GetProvBoolПроверкаИзвестия(List<Nodes_struct> list, Nodes_struct nownod)
+        public int getProvBoolПроверкаИзвестия(List<Node_struct> list, Node_struct nownod)
         {
             int res = 0;
             Parallel.ForEach(list, (nod, stateузлы) =>
                 {
-                    if (nod.id != nownod.id)
+                    if (nod.ID != nownod.ID)
                     {
                         bool child = false;
-                        Parallel.ForEach(nownod.connect_out, (связь, stateсвязь) =>
+                        Parallel.ForEach(nownod.connects_out, (связь, stateсвязь) =>
                             {
-                                if (связь.ID == nod.id)
+                                if (связь.ID == nod.ID)
                                 {
                                     child = true;
                                     stateсвязь.Break();
@@ -267,6 +295,81 @@ namespace SamianDouble
                     }
                 });
             return res;
+        }
+
+        /// <summary>
+        /// Проверка на зацикленность перед установкой связи, возвращет true, если зацикливается, false если не зацикливается
+        /// </summary>
+        /// <param name="list">Список уздлв</param>
+        /// <param name="nod">узел текущий</param>
+        /// <param name="idconnect">ид узла с которым устанавливается связь</param>
+        /// <param name="forback">в какую сторону связь true к детям, false - к родителям</param>
+        /// <param name="ignorforback">игнорирования параметра направления проверки</param>
+        /// <returns></returns>
+        public bool getProvBoolЗацикленность(List<Node_struct> list, Node_struct nod, Node_struct friend, bool forback, bool ignorforback)
+        {
+            if (friend == null)
+            {
+                MessageBox.Show("В функцию проверки узлов на цикл, попал ид несуществующего нода. Возможно ваша база повреждена, попробуйте загрузить последнюю работую версию из файла", "Ошибка", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
+                return true;
+            }
+            bool ifi = false;
+            if (forback || ignorforback)
+            {
+                Parallel.ForEach(friend.connects_out, (nodfriendfor, state) =>
+                {
+                    if (nodfriendfor.connects_out.Count == 0)
+                        state.Break();
+                    else
+                    {
+                        Parallel.ForEach(nodfriendfor.connects_out, (tmpnodfor, statefortwo) =>
+                        {
+                            if (tmpnodfor.ID == nod.ID)
+                            {
+                                ifi = true;
+                                statefortwo.Break();
+                            }
+                            else
+                            {
+                                ifi = getProvBoolЗацикленность(list, nod, tmpnodfor, true, false);
+                                if (ifi)
+                                    statefortwo.Break();
+                            }
+                        });
+                        if (ifi)
+                            state.Break();
+                    }
+                });
+            }
+            if (forback == false || ignorforback)
+            {
+                Parallel.ForEach(friend.connects_in, (nodfriendfor, state) =>
+                    {
+                        if (nodfriendfor.connects_in.Count == 0)
+                            state.Break();
+                        else
+                        {
+                            Parallel.ForEach(nodfriendfor.connects_in, (tmpnodfor, statefortwo) =>
+                                {
+                                    if (tmpnodfor.ID == nodfriendfor.ID)
+                                    {
+                                        ifi = true;
+                                        statefortwo.Break();
+                                    }
+                                    else
+                                    {
+                                        ifi = getProvBoolЗацикленность(list, nod, tmpnodfor, false, false);
+                                        if (ifi)
+                                            statefortwo.Break();
+                                    }
+                                });
+                            if (ifi)
+                                state.Break();
+                        }
+                    });
+            }
+            return ifi;
         }
     }
 }

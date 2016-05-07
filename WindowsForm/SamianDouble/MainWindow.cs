@@ -18,11 +18,11 @@ namespace SamianDouble
             InitializeComponent();
         }
 
-        public static List<Nodes_struct> listnodes { get;set; }
+        public static List<Node_struct> listnodes { get;set; }
 
         private void MainWindow_Load(object sender, EventArgs e)
         {
-            listnodes = new List<Nodes_struct>();
+            listnodes = new List<Node_struct>();
         }
 
         bool add_node = false;
@@ -49,29 +49,31 @@ namespace SamianDouble
             TreeNode n2 = new TreeNode("Промежуточные");
             TreeNode n3 = new TreeNode("Дети");
             TreeNode n4 = new TreeNode("Несвязные");
-            for (int i = 0; i < listnodes.Count; i++)
+            foreach (var node_st in listnodes)
             {
-                Nodes_struct node_st = listnodes[i];
                 TreeNode nod = new TreeNode();
-                nod.Name = node_st.id.ToString() + node_st.name;
-                nod.Text = node_st.name;
-                for (int j = 0; j < node_st.props.Count; j++)
+                nod.Name = node_st.ID.ToString() + node_st.Name;
+                nod.Text = node_st.Name;
+                foreach(var prope in node_st.props)
                 {
                     TreeNode nod_p = new TreeNode();
-                    nod_p.Name = node_st.id.ToString() + node_st.props[j].name;
-                    nod_p.Text = node_st.props[j].name;
+                    Parallel.Invoke(
+                    ()=> { nod_p.Name = node_st.ID.ToString() + prope.name; },
+                    ()=> { nod_p.Text = prope.name; },
+                    ()=> { if (prope.proc100) nod_p.BackColor = Color.Tomato; }
+                    );
                     nod.Nodes.Add(nod_p);
                 }
                 if (node_st.connects_in.Count == 0)
                 {
-                    if (node_st.connect_out.Count == 0)
+                    if (node_st.connects_out.Count == 0)
                         n4.Nodes.Add(nod);
                     else
                         n1.Nodes.Add(nod);
                 }
                 else
                 {
-                    if (node_st.connect_out.Count == 0)
+                    if (node_st.connects_out.Count == 0)
                         n3.Nodes.Add(nod);
                     else
                         n2.Nodes.Add(nod);
@@ -82,7 +84,6 @@ namespace SamianDouble
             treeView1.Nodes.Add(n3);
             treeView1.Nodes.Add(n4);
             treeView1.ExpandAll();
-            //в случае успеха в конце поадаем в удачный выход
             return true; 
         }
 
@@ -140,13 +141,13 @@ namespace SamianDouble
         {
             if (e.Button == System.Windows.Forms.MouseButtons.Left && e.Node.Level == 1)
             {
-                for (int j=0;j<treeView1.Nodes.Count;j++)
+                Parallel.For(0,treeView1.Nodes.Count,(j)=>
                 {
                     Parallel.For(0, treeView1.Nodes[j].Nodes.Count, (i, state) =>
                         {
                             treeView1.Nodes[j].Nodes[i].BackColor = Color.White;
                         });
-                }
+                });
                 e.Node.BackColor = Color.Red;
                 
                 int index = new Node().getSelectNode(e.Node, listnodes);
@@ -173,10 +174,10 @@ namespace SamianDouble
                             tr.BackColor = Color.LightBlue;
                         }
                     }
-                    for (int j = 0; j < listnodes[index].connect_out.Count; j++)
+                    for (int j = 0; j < listnodes[index].connects_out.Count; j++)
                     {
                         var tr = treeView1.Nodes[1].Nodes[i];
-                        var ln = listnodes[index].connect_out[j];
+                        var ln = listnodes[index].connects_out[j];
                         if (tr.Name == ln.ID.ToString() + ln.Name)
                         {
                             tr.BackColor = Color.LightGreen;
@@ -185,10 +186,10 @@ namespace SamianDouble
                 });
                 Parallel.For(0, treeView1.Nodes[2].Nodes.Count, (i, state) =>
                 {
-                    for (int j = 0; j < listnodes[index].connect_out.Count; j++)
+                    for (int j = 0; j < listnodes[index].connects_out.Count; j++)
                     {
                         var tr = treeView1.Nodes[2].Nodes[i];
-                        var ln = listnodes[index].connect_out[j];
+                        var ln = listnodes[index].connects_out[j];
                         if (tr.Name == ln.ID.ToString() + ln.Name)
                         {
                             tr.BackColor = Color.LightGreen;
@@ -219,7 +220,10 @@ namespace SamianDouble
                 treeListReplace();
             } else if (e.Button == MouseButtons.Left && e.Node.Level == 2)
             {
-
+                Node n = new Node();
+                n.nodeFixPropertyThisNod(e.Node, listnodes);
+                treeListReplace();
+                e.Node.Checked = false;
             }
         }
 
@@ -233,6 +237,27 @@ namespace SamianDouble
         {
             FileLoadAndSave f = new FileLoadAndSave();
             f.saveToFile(listnodes);
+        }
+
+        private void button_DeleteNode_Click(object sender, EventArgs e)
+        {
+            if (treeView1.SelectedNode.Level != 1)
+                return;
+            int i = new Node().getSelectNode(treeView1.SelectedNode, listnodes);
+            listnodes.RemoveAt(i);
+            treeListReplace();
+        }
+
+        private void button1ClearFix_Click(object sender, EventArgs e)
+        {
+            Parallel.ForEach(listnodes, (nod) =>
+                {
+                    Parallel.ForEach(nod.props, (propppppp) =>
+                        {
+                            propppppp.proc100 = false;
+                        });
+                });
+            treeListReplace();
         }
     }
 }

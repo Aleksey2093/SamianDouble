@@ -23,7 +23,7 @@ namespace SamianDouble
         /// <param name="nod"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public double[] values_editors(EditNode.propсмежность[][] смежность, Nodes_struct nod, List<Nodes_struct> list)
+        public double[] values_editors(EditNode.propсмежность[][] смежность, Node_struct nod, List<Node_struct> list)
         {
             double[] values = new double[nod.props.Count];
             int n = смежность.Length;
@@ -56,13 +56,13 @@ namespace SamianDouble
             }
             return values;
         }
-        public double getNodPropsValueEditor(List<Nodes_struct> list, int id, string nameprop)
+        public double getNodPropsValueEditor(List<Node_struct> list, int id, string nameprop)
         {
-            Nodes_struct nod = new Nodes_struct();
+            Node_struct nod = new Node_struct();
 
             Parallel.For(0, list.Count, (i, state) =>
             {
-                if (list[i].id == id)
+                if (list[i].ID == id)
                 {
                     nod = list[i];
                     state.Break();

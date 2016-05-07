@@ -14,13 +14,13 @@ namespace SamianDouble
 {
     public partial class EditNode : Form
     {
-        public Nodes_struct thisnod { get; set; }
+        public Node_struct thisnod { get; set; }
 
         public int thisnod_i { get; set; }
 
         public List<Othernode> othernods { get; set; }
 
-        public List<Nodes_struct> tmplistnodes { get; set; }
+        public List<Node_struct> tmplistnodes { get; set; }
 
         public EditNode()
         {
@@ -29,14 +29,14 @@ namespace SamianDouble
 
         private void EditNode_Load(object sender, EventArgs e)
         {
-            textBox1.Text = thisnod.name;
+            textBox1.Text = thisnod.Name;
             listBox1ConnectIn.DisplayMember = "Name";
             listBox1ConnectIn.ValueMember = "ID";
             listBox1ConnectIn.DataSource = thisnod.connects_in;
 
             listBox2ConnectOut.DisplayMember = "Name";
             listBox2ConnectOut.ValueMember = "ID";
-            listBox2ConnectOut.DataSource = thisnod.connect_out;
+            listBox2ConnectOut.DataSource = thisnod.connects_out;
 
             if (!getOtherNodes())
                 this.Close();
@@ -46,7 +46,7 @@ namespace SamianDouble
             listBox3OtherNode.DataSource = othernods;
 
             UpdateDataGrivTable(false);
-            this.Text = "EditNode " + thisnod.name;
+            this.Text = "EditNode " + thisnod.Name;
         }
 
         public struct propсмежность
@@ -61,7 +61,7 @@ namespace SamianDouble
         /// <param name="colrow">строки - количество связей входящих</param>
         /// <param name="colcol">столбцы - длинна одной линии значений (они все одинаковые должны быть, если не было ошибок)</param>
         /// <returns></returns>
-        public propсмежность[][] getMatrixСмежность(Nodes_struct tmpinode, int colrow, int colcol, List<Nodes_struct> listik)
+        public propсмежность[][] getMatrixСмежность(Node_struct tmpinode, int colrow, int colcol, List<Node_struct> listik)
         {
             propсмежность[][] mat = new propсмежность[colrow][];
             List<int> idnodes = new List<int>();
@@ -71,7 +71,7 @@ namespace SamianDouble
                 {
                     for (int j = 0; j < tmpinode.connects_in.Count; j++)
                     {
-                        if (tmpinode.connects_in[j].ID == listik[i].id)
+                        if (tmpinode.connects_in[j].ID == listik[i].ID)
                         {
                             idnodes.Add(i);
                         }
@@ -88,7 +88,7 @@ namespace SamianDouble
                 ifigoto:
                     if (hh < h)
                     {
-                        mat[i][j].id = othnod.id;
+                        mat[i][j].id = othnod.ID;
                         mat[i][j].prop_name = othnod.props[ij].name;
                         hh++;
                     }
@@ -158,8 +158,8 @@ namespace SamianDouble
             }
             GridCellColor[,] gridcell = new GridCellColor[rows, len_columns + 1];
             int i = 0;
-            List<Nodes_struct> list = tmplistnodes;
-            for (i = 0; i < len_columns; i++)
+            List<Node_struct> list = tmplistnodes;
+            for (i = 0; i < len_columns;i++ )
             {
                 table.Columns.Add("");
             }
@@ -168,14 +168,14 @@ namespace SamianDouble
                 int id = thisnod.connects_in[i].ID;
                 for (int k = 0; k < list.Count; k++)
                 {
-                    if (id == list[i].id)
+                    if (id == list[i].ID)
                     {
                         id = i;
                         break;
                     }
                 }
                 table.Rows.Add();
-                table.Rows[i][0] = list[id].name;
+                table.Rows[i][0] = list[id].Name;
                 dataGridView1.Rows[i].Cells[0].ReadOnly = true;
                 gridcell[i, 0].setvalue(i, 0, Color.Red);
                 dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.Red;
@@ -203,7 +203,7 @@ namespace SamianDouble
                         gridcell[i, j].setvalue(i, j, Color.LightBlue);
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = Color.LightBlue;
                     }
-                }
+                };
                 if (mat.Length >= 0 && параметр == true)
                 {
                     table.Columns.Add("Вероятности");
@@ -234,23 +234,22 @@ namespace SamianDouble
         /// <returns>возвращает список в глобальную переменную и bool в качестве успеха</returns>
         private bool getOtherNodes()
         {
+            Node nodeclass = new Node();
             othernods = new List<Othernode>();
-            List<Nodes_struct> list = tmplistnodes;
+            List<Node_struct> list = tmplistnodes;
             Parallel.For(0, list.Count, (i, state) =>
             {
                 bool ifi = true;
-                if (list[i].id == thisnod.id)
-                {
+                if (list[i].ID == thisnod.ID)
                     ifi = false;
-                }
                 if (ifi)
                 {
                     ifi = getProvConnectNodeToNode(list[i]);
                     if (ifi)
                     {
                         Othernode ot = new Othernode();
-                        ot.id = list[i].id;
-                        ot.name = list[i].name;
+                        ot.id = list[i].ID;
+                        ot.name = list[i].Name;
                         othernods.Add(ot);
 
                     }
@@ -259,20 +258,20 @@ namespace SamianDouble
             return true;
         }
 
-        private bool getProvConnectNodeToNode(Nodes_struct nodes_struct)
+        private bool getProvConnectNodeToNode(Node_struct nodes_struct)
         {
             for (int i = 0; i < thisnod.connects_in.Count; i++)
-                if (thisnod.connects_in[i].conid == nodes_struct.id)
+                if (thisnod.connects_in[i].ID == nodes_struct.ID)
                     return false;
-            for (int i = 0; i < thisnod.connect_out.Count; i++)
-                if (thisnod.connect_out[i].conid == nodes_struct.id)
+            for (int i = 0; i < thisnod.connects_out.Count; i++)
+                if (thisnod.connects_out[i].ID == nodes_struct.ID)
                     return false;
             return true;
         }
 
         private void EditNode_FormClosing(object sender, FormClosingEventArgs e)
         {
-            thisnod.name = textBox1.Text;
+            thisnod.Name = textBox1.Text;
             Сохр_таблицу_в_узел();
         }
 
@@ -322,6 +321,7 @@ namespace SamianDouble
 
         private void listBox2ConnectOut_DragDrop(object sender, DragEventArgs e)
         {
+            Node nodeclass = new Node();
             string name = e.Data.GetData(DataFormats.Text).ToString();
             int what = int.Parse(name.Substring(0, 1));
             if (what == 1)
@@ -339,6 +339,10 @@ namespace SamianDouble
             }
             if (id == -1)
                 return;
+            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, nodeclass.getNodeПоИд(tmplistnodes,id), true, false))
+            {
+                return;
+            }
             UpdateNode ap = new UpdateNode();
             for (int i = 0; i < thisnod.connects_in.Count; i++)
                 if (id == thisnod.connects_in[i].ID)
@@ -354,7 +358,7 @@ namespace SamianDouble
 
                     Parallel.For(0, tmplistnodes.Count, (j, state) =>
                     {
-                        if (tmplistnodes[j].id == thisnod.id)
+                        if (tmplistnodes[j].ID == thisnod.ID)
                         {
                             thisnod = tmplistnodes[j];
                             state.Break();
@@ -365,7 +369,7 @@ namespace SamianDouble
                         listBox2ConnectOut.DataSource = null;
                         listBox2ConnectOut.DisplayMember = "Name";
                         listBox2ConnectOut.ValueMember = "ID";
-                        listBox2ConnectOut.DataSource = thisnod.connect_out;
+                        listBox2ConnectOut.DataSource = thisnod.connects_out;
                     }
                     else if (what == 2)
                     {
@@ -377,8 +381,8 @@ namespace SamianDouble
                     UpdateDataGrivTable(false);
                     //return;
                 }
-            for (int i = 0; i < thisnod.connect_out.Count; i++)
-                if (id == thisnod.connect_out[i].ID)
+            for (int i = 0; i < thisnod.connects_out.Count; i++)
+                if (id == thisnod.connects_out[i].ID)
                     return;
             for (int i = 0; i < othernods.Count; i++)
                 if (id == othernods[i].ID)
@@ -395,7 +399,7 @@ namespace SamianDouble
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
                 {
-                    if (tmplistnodes[i].id == thisnod.id)
+                    if (tmplistnodes[i].ID == thisnod.ID)
                     {
                         thisnod = tmplistnodes[i];
                         state.Break();
@@ -405,7 +409,7 @@ namespace SamianDouble
             listBox2ConnectOut.DataSource = null;
             listBox2ConnectOut.DisplayMember = "Name";
             listBox2ConnectOut.ValueMember = "ID";
-            listBox2ConnectOut.DataSource = thisnod.connect_out;
+            listBox2ConnectOut.DataSource = thisnod.connects_out;
 
             UpdateDataGrivTable(false);
         }
@@ -417,6 +421,7 @@ namespace SamianDouble
 
         private void listBox1ConnectIn_DragDrop(object sender, DragEventArgs e)
         {
+            Node nodeclass = new Node();
             string name = e.Data.GetData(DataFormats.Text).ToString();
             int what = int.Parse(name.Substring(0, 1));
             if (what == 2)
@@ -434,9 +439,11 @@ namespace SamianDouble
             }
             if (id == -1)
                 return;
+            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, nodeclass.getNodeПоИд(tmplistnodes, id), true, false))
+                return;
             UpdateNode ap = new UpdateNode();
-            for (int i = 0; i < thisnod.connect_out.Count; i++)
-                if (id == thisnod.connect_out[i].ID)
+            for (int i = 0; i < thisnod.connects_out.Count; i++)
+                if (id == thisnod.connects_out[i].ID)
                 {
                     if (what == 1) //out
                     {
@@ -449,7 +456,7 @@ namespace SamianDouble
 
                     Parallel.For(0, tmplistnodes.Count, (j, state) =>
                     {
-                        if (tmplistnodes[j].id == thisnod.id)
+                        if (tmplistnodes[j].ID == thisnod.ID)
                         {
                             thisnod = tmplistnodes[j];
                             state.Break();
@@ -460,7 +467,7 @@ namespace SamianDouble
                         listBox2ConnectOut.DataSource = null;
                         listBox2ConnectOut.DisplayMember = "Name";
                         listBox2ConnectOut.ValueMember = "ID";
-                        listBox2ConnectOut.DataSource = thisnod.connect_out;
+                        listBox2ConnectOut.DataSource = thisnod.connects_out;
                     }
                     else if (what == 2)
                     {
@@ -491,7 +498,7 @@ namespace SamianDouble
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
             {
-                if (tmplistnodes[i].id == thisnod.id)
+                if (tmplistnodes[i].ID == thisnod.ID)
                 {
                     thisnod = tmplistnodes[i];
                     state.Break();
@@ -560,7 +567,7 @@ namespace SamianDouble
 
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
             {
-                if (tmplistnodes[i].id == thisnod.id)
+                if (tmplistnodes[i].ID == thisnod.ID)
                 {
                     thisnod = tmplistnodes[i];
                     state.Break();
@@ -571,7 +578,7 @@ namespace SamianDouble
                 listBox2ConnectOut.DataSource = null;
                 listBox2ConnectOut.DisplayMember = "Name";
                 listBox2ConnectOut.ValueMember = "ID";
-                listBox2ConnectOut.DataSource = thisnod.connect_out;
+                listBox2ConnectOut.DataSource = thisnod.connects_out;
             }
             else if (what == 2)
             {
@@ -592,7 +599,7 @@ namespace SamianDouble
         {
             Parallel.For(0, tmplistnodes.Count, (i, state) =>
                 {
-                    if (tmplistnodes[i].id == thisnod.id)
+                    if (tmplistnodes[i].ID == thisnod.ID)
                     {
                         tmplistnodes[i] = thisnod;
                         state.Break();

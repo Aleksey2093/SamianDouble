@@ -28,10 +28,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.TreeNode treeNode5 = new System.Windows.Forms.TreeNode("Родители");
-            System.Windows.Forms.TreeNode treeNode6 = new System.Windows.Forms.TreeNode("Промежуточные");
-            System.Windows.Forms.TreeNode treeNode7 = new System.Windows.Forms.TreeNode("Дети");
-            System.Windows.Forms.TreeNode treeNode8 = new System.Windows.Forms.TreeNode("Несвязные");
+            System.Windows.Forms.TreeNode treeNode1 = new System.Windows.Forms.TreeNode("Родители");
+            System.Windows.Forms.TreeNode treeNode2 = new System.Windows.Forms.TreeNode("Промежуточные");
+            System.Windows.Forms.TreeNode treeNode3 = new System.Windows.Forms.TreeNode("Дети");
+            System.Windows.Forms.TreeNode treeNode4 = new System.Windows.Forms.TreeNode("Несвязные");
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
@@ -39,11 +39,13 @@
             this.button_DeleteNode = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.treeView1 = new System.Windows.Forms.TreeView();
-            this.nodes_площадкадляразмещения = new System.Windows.Forms.FlowLayoutPanel();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.файлToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.открытьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.сохранитьToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
+            this.button1ClearFix = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -51,6 +53,8 @@
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
             this.menuStrip1.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -76,6 +80,7 @@
             this.flowLayoutPanel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.flowLayoutPanel1.Controls.Add(this.button_AddNode);
             this.flowLayoutPanel1.Controls.Add(this.button_DeleteNode);
+            this.flowLayoutPanel1.Controls.Add(this.button1ClearFix);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 435);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
@@ -102,6 +107,7 @@
             this.button_DeleteNode.TabIndex = 1;
             this.button_DeleteNode.Text = "Удалить узел";
             this.button_DeleteNode.UseVisualStyleBackColor = true;
+            this.button_DeleteNode.Click += new System.EventHandler(this.button_DeleteNode_Click);
             // 
             // splitContainer1
             // 
@@ -115,7 +121,7 @@
             // 
             // splitContainer1.Panel2
             // 
-            this.splitContainer1.Panel2.Controls.Add(this.nodes_площадкадляразмещения);
+            this.splitContainer1.Panel2.Controls.Add(this.panel1);
             this.splitContainer1.Size = new System.Drawing.Size(1100, 401);
             this.splitContainer1.SplitterDistance = 260;
             this.splitContainer1.TabIndex = 1;
@@ -126,34 +132,25 @@
             this.treeView1.LabelEdit = true;
             this.treeView1.Location = new System.Drawing.Point(0, 0);
             this.treeView1.Name = "treeView1";
-            treeNode5.Name = "Узел0";
-            treeNode5.Text = "Родители";
-            treeNode6.Name = "Узел1";
-            treeNode6.Text = "Промежуточные";
-            treeNode7.Name = "Узел2";
-            treeNode7.Text = "Дети";
-            treeNode8.Name = "Узел3";
-            treeNode8.Text = "Несвязные";
+            treeNode1.Name = "Узел0";
+            treeNode1.Text = "Родители";
+            treeNode2.Name = "Узел1";
+            treeNode2.Text = "Промежуточные";
+            treeNode3.Name = "Узел2";
+            treeNode3.Text = "Дети";
+            treeNode4.Name = "Узел3";
+            treeNode4.Text = "Несвязные";
             this.treeView1.Nodes.AddRange(new System.Windows.Forms.TreeNode[] {
-            treeNode5,
-            treeNode6,
-            treeNode7,
-            treeNode8});
+            treeNode1,
+            treeNode2,
+            treeNode3,
+            treeNode4});
             this.treeView1.Size = new System.Drawing.Size(260, 401);
             this.treeView1.TabIndex = 0;
             this.treeView1.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.treeView1_AfterLabelEdit);
             this.treeView1.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseClick);
             this.treeView1.NodeMouseDoubleClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeView1_NodeMouseDoubleClick);
             this.treeView1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeView1_MouseDown);
-            // 
-            // nodes_площадкадляразмещения
-            // 
-            this.nodes_площадкадляразмещения.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.nodes_площадкадляразмещения.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.nodes_площадкадляразмещения.Location = new System.Drawing.Point(0, 0);
-            this.nodes_площадкадляразмещения.Name = "nodes_площадкадляразмещения";
-            this.nodes_площадкадляразмещения.Size = new System.Drawing.Size(836, 401);
-            this.nodes_площадкадляразмещения.TabIndex = 2;
             // 
             // menuStrip1
             // 
@@ -188,6 +185,36 @@
             this.сохранитьToolStripMenuItem.Text = "Сохранить";
             this.сохранитьToolStripMenuItem.Click += new System.EventHandler(this.сохранитьToolStripMenuItem_Click);
             // 
+            // panel1
+            // 
+            this.panel1.AutoScroll = true;
+            this.panel1.AutoSize = true;
+            this.panel1.Controls.Add(this.pictureBox1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(836, 401);
+            this.panel1.TabIndex = 0;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(836, 401);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            // 
+            // button1ClearFix
+            // 
+            this.button1ClearFix.Location = new System.Drawing.Point(207, 3);
+            this.button1ClearFix.Name = "button1ClearFix";
+            this.button1ClearFix.Size = new System.Drawing.Size(131, 23);
+            this.button1ClearFix.TabIndex = 2;
+            this.button1ClearFix.Text = "Снять все фиксации";
+            this.button1ClearFix.UseVisualStyleBackColor = true;
+            this.button1ClearFix.Click += new System.EventHandler(this.button1ClearFix_Click);
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -204,10 +231,13 @@
             this.flowLayoutPanel1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
+            this.splitContainer1.Panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
+            this.panel1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -220,11 +250,13 @@
         private System.Windows.Forms.Button button_DeleteNode;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TreeView treeView1;
-        private System.Windows.Forms.FlowLayoutPanel nodes_площадкадляразмещения;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem файлToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem открытьToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem сохранитьToolStripMenuItem;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button button1ClearFix;
 
     }
 }

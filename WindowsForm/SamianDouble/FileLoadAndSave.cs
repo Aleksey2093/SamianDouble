@@ -10,7 +10,13 @@ namespace SamianDouble
 {
     class FileLoadAndSave
     {
-        public List<Nodes_struct> loadFife(List<Nodes_struct> listnodesold)
+        public struct pirtopi
+        {
+            public int one;
+            public int two;
+        }
+
+        public List<Node_struct> loadFife(List<Node_struct> listnodesold)
         {
             try
             {
@@ -48,12 +54,13 @@ namespace SamianDouble
                             goto retelse;
                     }
                 }
-                List<Nodes_struct> listnodes = new List<Nodes_struct>();
+                List<Node_struct> listnodes = new List<Node_struct>();
+                List<pirtopi> listconnectnodes = new List<pirtopi>();
                 foreach (XmlNode line in doc.DocumentElement)
                 {
-                    Nodes_struct nod = new Nodes_struct();
-                    nod.id = int.Parse(line.ChildNodes[0].InnerText);
-                    nod.name = line.ChildNodes[1].InnerText;
+                    Node_struct nod = new Node_struct();
+                    nod.ID = int.Parse(line.ChildNodes[0].InnerText);
+                    nod.Name = line.ChildNodes[1].InnerText;
                     nod.props = new List<Propertys_struct>();
                     foreach (XmlNode pxml in line.ChildNodes[2].ChildNodes) //проверти
                     {
@@ -77,25 +84,30 @@ namespace SamianDouble
                     }
                     if (line.ChildNodes.Count > 2)
                     {
-                        List<Connect_list> connecslist = new List<Connect_list>();
-                        Connect_list oneconnect = new Connect_list();
+                        List<int> connecslist = new List<int>();
+                        int oneconnect;
 
                         foreach (XmlNode conxml in line.ChildNodes[3])
                         {
-                            oneconnect = new Connect_list();
-                            oneconnect.ID = int.Parse(conxml.ChildNodes[0].InnerText);
-                            oneconnect.Name = conxml.ChildNodes[1].InnerText;
+                            oneconnect = int.Parse(conxml.ChildNodes[0].InnerText);
                             connecslist.Add(oneconnect);
                         }
-
                         if (line.ChildNodes[3].Name == "in")
-                        {
-                            nod.connects_in = connecslist;
-                        }
+                            Parallel.ForEach(connecslist, (coni, state) =>
+                                {
+                                    pirtopi p = new pirtopi();
+                                    p.one = coni;
+                                    p.two = nod.ID;
+                                    listconnectnodes.Add(p);
+                                });
                         else if (line.ChildNodes[3].Name == "out")
-                        {
-                            nod.connect_out = connecslist;
-                        }
+                            Parallel.ForEach(connecslist, (coni, state) =>
+                            {
+                                pirtopi p = new pirtopi();
+                                p.two = coni;
+                                p.one = nod.ID;
+                                listconnectnodes.Add(p);
+                            });
                         else
                         {
                             MessageBox.Show("Указанный файл хранит данные неподходящие для приложения. Выберите правильный файл.", "Ошибка",
@@ -105,25 +117,31 @@ namespace SamianDouble
                     }
                     if (line.ChildNodes.Count > 3)
                     {
-                        List<Connect_list> connecslist = new List<Connect_list>();
-                        Connect_list oneconnect = new Connect_list();
+                        List<int> connecslist = new List<int>();
+                        int oneconnect;
 
                         foreach (XmlNode conxml in line.ChildNodes[4])
                         {
-                            oneconnect = new Connect_list();
-                            oneconnect.ID = int.Parse(conxml.ChildNodes[0].InnerText);
-                            oneconnect.Name = conxml.ChildNodes[1].InnerText;
+                            oneconnect = int.Parse(conxml.ChildNodes[0].InnerText);
                             connecslist.Add(oneconnect);
                         }
 
                         if (line.ChildNodes[4].Name == "in")
-                        {
-                            nod.connects_in = connecslist;
-                        }
+                            Parallel.ForEach(connecslist, (coni, state) =>
+                            {
+                                pirtopi p = new pirtopi();
+                                p.one = coni;
+                                p.two = nod.ID;
+                                listconnectnodes.Add(p);
+                            });
                         else if (line.ChildNodes[4].Name == "out")
-                        {
-                            nod.connect_out = connecslist;
-                        }
+                            Parallel.ForEach(connecslist, (coni, state) =>
+                            {
+                                pirtopi p = new pirtopi();
+                                p.two = coni;
+                                p.one = nod.ID;
+                                listconnectnodes.Add(p);
+                            });
                         else
                         {
                             MessageBox.Show("Указанный файл хранит данные неподходящие для приложения. Выберите правильный файл.", "Ошибка",
@@ -133,6 +151,14 @@ namespace SamianDouble
                     }
                     listnodes.Add(nod);
                 }
+                Node nodeclass = new Node();
+                Parallel.ForEach(listconnectnodes, (connect) =>
+                    {
+                        Node_struct nodисходит = nodeclass.getNodeПоИд(listnodes, connect.one);
+                        Node_struct nodвходит = nodeclass.getNodeПоИд(listnodes, connect.two);
+                        nodисходит.connects_out.Add(nodвходит);
+                        nodвходит.connects_in.Add(nodисходит);
+                    });
                 if (проверкаЗагруженногоФайла(listnodes))
                     return listnodes;
                 else
@@ -146,16 +172,17 @@ namespace SamianDouble
             }
         }
 
-        public bool проверкаЗагруженногоФайла(List<Nodes_struct> list)
+        public bool проверкаЗагруженногоФайла(List<Node_struct> list)
         {
             bool corr = true;
+            Node nodeclass = new Node();
             List<string> errrors = new List<string>();
             Parallel.ForEach(list, (nod, statenod) =>
             {
-                if (nod.name == null || nod.name == "")
+                if (nod.Name == null || nod.Name == "")
                 {
                     corr = false;
-                    errrors.Add("Имя узла с ид " + nod.id + "задано не правильно;");
+                    errrors.Add("Имя узла с ид " + nod.ID + "задано не правильно;");
                     statenod.Break(); //имя не сошлось
                 }
                 List<int> сколькодолжныбытьзначений = new List<int>();
@@ -169,7 +196,7 @@ namespace SamianDouble
                             {
                                 if (зн1 != зн2)
                                 {
-                                    errrors.Add("значение в узле id " + nod.id + " name " + nod.name + " заданы неправильно." +
+                                    errrors.Add("значение в узле id " + nod.ID + " name " + nod.Name + " заданы неправильно." +
                                         "Похоже, что количество значений у свойств разное.");
                                     corr = false;
                                     sttta.Break();
@@ -186,18 +213,44 @@ namespace SamianDouble
                         bool нашли = false;
                         Parallel.ForEach(list, (ot, stateot) =>
                             {
-                                if (ot.id == conn.ID)
+                                if (ot == conn)
                                 {
-                                    if (ot.name != conn.Name)
-                                    {
-                                        conn.Name = ot.name;
-                                    }
                                     нашли = true;
                                     колвознаподм.Add(ot.props.Count);
                                     stateot.Break();
                                 }
                             });
                         if (!нашли)
+                        {
+                            corr = false;
+                            stateподключени.Break();
+                        }
+                        нашли = nodeclass.getProvBoolЗацикленность(list,nod,conn,false,false);
+                        if (нашли)
+                        {
+                            corr = false;
+                            stateподключени.Break();
+                        }
+                    });
+                Parallel.ForEach(nod.connects_out, (conn, stateподключени) =>
+                    {
+                        bool нашли = false;
+                        Parallel.ForEach(list, (ot, stateot) =>
+                        {
+                            if (ot == conn)
+                            {
+                                нашли = true;
+                                колвознаподм.Add(ot.props.Count);
+                                stateot.Break();
+                            }
+                        });
+                        if (!нашли)
+                        {
+                            corr = false;
+                            stateподключени.Break();
+                        }
+                        нашли = nodeclass.getProvBoolЗацикленность(list, nod, conn, true, false);
+                        if (нашли)
                         {
                             corr = false;
                             stateподключени.Break();
@@ -229,7 +282,7 @@ namespace SamianDouble
             return corr;
         }
 
-        public bool saveToFile(List<Nodes_struct> listnodes)
+        public bool saveToFile(List<Node_struct> listnodes)
         {
             if (listnodes.Count == 0)
             {
@@ -244,13 +297,13 @@ namespace SamianDouble
             String path = s.FileName;
             List<String> lineslist = new List<string>();
             lineslist.Add("<variables>");
-            foreach (Nodes_struct nod in listnodes)
+            foreach (Node_struct nod in listnodes)
             {
                 lineslist.Add("\t<node>");
 
 
-                lineslist.Add("\t<id>" + nod.id + "</id>");
-                lineslist.Add("\t<name>" + nod.name + "</name>");
+                lineslist.Add("\t<id>" + nod.ID + "</id>");
+                lineslist.Add("\t<name>" + nod.Name + "</name>");
 
                 lineslist.Add("\t<propertis>");
                 foreach (Propertys_struct pr in nod.props)
@@ -270,22 +323,20 @@ namespace SamianDouble
 
 
                 lineslist.Add("\t<in>");
-                foreach (Connect_list connect in nod.connects_in)
+                foreach (var connect in nod.connects_in)
                 {
                     lineslist.Add("\t\t<connect>");
                     lineslist.Add("\t\t\t<idcon>" + connect.ID + "</idcon>");
-                    lineslist.Add("\t\t\t<namecon>" + connect.Name + "</namecon>");
                     lineslist.Add("\t\t</connect>");
                 }
                 lineslist.Add("\t</in>");
 
 
                 lineslist.Add("\t<out>");
-                foreach (Connect_list connect in nod.connect_out)
+                foreach (var connect in nod.connects_out)
                 {
                     lineslist.Add("\t\t<connect>");
                     lineslist.Add("\t\t\t<idcon>" + connect.ID + "</idcon>");
-                    lineslist.Add("\t\t\t<namecon>" + connect.Name + "</namecon>");
                     lineslist.Add("\t\t</connect>");
                 }
                 lineslist.Add("\t</out>");

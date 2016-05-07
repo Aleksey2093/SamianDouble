@@ -11,14 +11,14 @@ namespace SamianDouble
     /// </summary>
     class NodeValueMathUp
     {
-        public double[] valueeditorup (EditNode.propсмежность[][] смежность, Nodes_struct nod, List<Nodes_struct> list)
+        public double[] valueeditorup (EditNode.propсмежность[][] смежность, Node_struct nod, List<Node_struct> list)
         {
             double[] valueeditor = new double[nod.props.Count];
             EditNode editnod = new EditNode();
             NodeValueMathDown valdown = new NodeValueMathDown();
             foreach(var nownod in list)
             {
-                if (nownod.connect_out.Count > 0)
+                if (nownod.connects_out.Count > 0)
                 {
                     EditNode.propсмежность[][] tmpmat = editnod.getMatrixСмежность(nownod, nownod.connects_in.Count, nownod.props[0].values.Count, list);
                     valdown.values_editors(tmpmat, nownod, list);

@@ -44,10 +44,13 @@
             this.button1Отменить = new System.Windows.Forms.Button();
             this.button1Math = new System.Windows.Forms.Button();
             this.button1СохранитьТаблицу = new System.Windows.Forms.Button();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.flowLayoutPanel1.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -58,14 +61,16 @@
             this.tableLayoutPanel1.Controls.Add(this.dataGridView1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBox1, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.flowLayoutPanel1, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 4);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
+            this.tableLayoutPanel1.RowCount = 5;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(896, 529);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
@@ -82,12 +87,12 @@
             this.tableLayoutPanel2.Controls.Add(this.listBox3OtherNode, 2, 1);
             this.tableLayoutPanel2.Controls.Add(this.label3, 2, 0);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 263);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(3, 250);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 2;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(890, 228);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(890, 215);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
             // listBox1ConnectIn
@@ -97,7 +102,7 @@
             this.listBox1ConnectIn.FormattingEnabled = true;
             this.listBox1ConnectIn.Location = new System.Drawing.Point(3, 23);
             this.listBox1ConnectIn.Name = "listBox1ConnectIn";
-            this.listBox1ConnectIn.Size = new System.Drawing.Size(290, 202);
+            this.listBox1ConnectIn.Size = new System.Drawing.Size(290, 189);
             this.listBox1ConnectIn.TabIndex = 0;
             this.listBox1ConnectIn.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox1ConnectIn_DragDrop);
             this.listBox1ConnectIn.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBox1ConnectIn_DragEnter);
@@ -110,7 +115,7 @@
             this.listBox2ConnectOut.FormattingEnabled = true;
             this.listBox2ConnectOut.Location = new System.Drawing.Point(299, 23);
             this.listBox2ConnectOut.Name = "listBox2ConnectOut";
-            this.listBox2ConnectOut.Size = new System.Drawing.Size(290, 202);
+            this.listBox2ConnectOut.Size = new System.Drawing.Size(290, 189);
             this.listBox2ConnectOut.TabIndex = 1;
             this.listBox2ConnectOut.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox2ConnectOut_DragDrop);
             this.listBox2ConnectOut.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBox2ConnectOut_DragEnter);
@@ -145,7 +150,7 @@
             this.listBox3OtherNode.FormattingEnabled = true;
             this.listBox3OtherNode.Location = new System.Drawing.Point(595, 23);
             this.listBox3OtherNode.Name = "listBox3OtherNode";
-            this.listBox3OtherNode.Size = new System.Drawing.Size(292, 202);
+            this.listBox3OtherNode.Size = new System.Drawing.Size(292, 189);
             this.listBox3OtherNode.TabIndex = 4;
             this.listBox3OtherNode.DragDrop += new System.Windows.Forms.DragEventHandler(this.listBox3OtherNode_DragDrop);
             this.listBox3OtherNode.DragEnter += new System.Windows.Forms.DragEventHandler(this.listBox3OtherNode_DragEnter);
@@ -170,7 +175,7 @@
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(3, 29);
             this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.Size = new System.Drawing.Size(890, 228);
+            this.dataGridView1.Size = new System.Drawing.Size(890, 215);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellValueChanged);
             // 
@@ -188,18 +193,17 @@
             this.flowLayoutPanel1.AutoSize = true;
             this.flowLayoutPanel1.Controls.Add(this.button1Сохранить);
             this.flowLayoutPanel1.Controls.Add(this.button1Отменить);
-            this.flowLayoutPanel1.Controls.Add(this.button1Math);
             this.flowLayoutPanel1.Controls.Add(this.button1СохранитьТаблицу);
+            this.flowLayoutPanel1.Controls.Add(this.button1Math);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.RightToLeft;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 497);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 471);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(890, 29);
             this.flowLayoutPanel1.TabIndex = 3;
             // 
             // button1Сохранить
             // 
-            this.button1Сохранить.Location = new System.Drawing.Point(812, 3);
+            this.button1Сохранить.Location = new System.Drawing.Point(3, 3);
             this.button1Сохранить.Name = "button1Сохранить";
             this.button1Сохранить.Size = new System.Drawing.Size(75, 23);
             this.button1Сохранить.TabIndex = 0;
@@ -210,7 +214,7 @@
             // 
             // button1Отменить
             // 
-            this.button1Отменить.Location = new System.Drawing.Point(731, 3);
+            this.button1Отменить.Location = new System.Drawing.Point(84, 3);
             this.button1Отменить.Name = "button1Отменить";
             this.button1Отменить.Size = new System.Drawing.Size(75, 23);
             this.button1Отменить.TabIndex = 1;
@@ -221,7 +225,7 @@
             // 
             // button1Math
             // 
-            this.button1Math.Location = new System.Drawing.Point(650, 3);
+            this.button1Math.Location = new System.Drawing.Point(290, 3);
             this.button1Math.Name = "button1Math";
             this.button1Math.Size = new System.Drawing.Size(75, 23);
             this.button1Math.TabIndex = 2;
@@ -231,13 +235,29 @@
             // 
             // button1СохранитьТаблицу
             // 
-            this.button1СохранитьТаблицу.Location = new System.Drawing.Point(525, 3);
+            this.button1СохранитьТаблицу.Location = new System.Drawing.Point(165, 3);
             this.button1СохранитьТаблицу.Name = "button1СохранитьТаблицу";
             this.button1СохранитьТаблицу.Size = new System.Drawing.Size(119, 23);
             this.button1СохранитьТаблицу.TabIndex = 3;
             this.button1СохранитьТаблицу.Text = "Сохранить таблицу";
             this.button1СохранитьТаблицу.UseVisualStyleBackColor = true;
             this.button1СохранитьТаблицу.Click += new System.EventHandler(this.button1СохранитьТаблицу_Click);
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabel1});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 507);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(896, 22);
+            this.statusStrip1.TabIndex = 4;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(81, 17);
+            this.toolStripStatusLabel1.Text = "Информация";
             // 
             // EditNode
             // 
@@ -256,6 +276,8 @@
             this.tableLayoutPanel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.flowLayoutPanel1.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -277,5 +299,7 @@
         private System.Windows.Forms.Button button1Отменить;
         private System.Windows.Forms.Button button1Math;
         private System.Windows.Forms.Button button1СохранитьТаблицу;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
     }
 }
