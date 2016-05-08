@@ -11,11 +11,6 @@ namespace SamianDouble
     /// </summary>
     class NodeValueMathDown
     {
-        public struct propсмежность
-        {
-            public int id;
-            public string prop_name;
-        }
         /// <summary>
         /// получение вероятностей
         /// </summary>
@@ -23,7 +18,7 @@ namespace SamianDouble
         /// <param name="nod"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public double[] values_editors(EditNode.propсмежность[][] смежность, Node_struct nod, List<Node_struct> list)
+        public double[] getValues_editors(EditNode.propсмежность[][] смежность, Node_struct nod, List<Node_struct> list)
         {
             double[] values = new double[nod.props.Count];
             int n = смежность.Length;
@@ -92,7 +87,7 @@ namespace SamianDouble
                     else if (nod.props[i].values.Count > 1)
                     {
                         EditNode.propсмежность[][] см = new EditNode().getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
-                        values_editors(см, nod, list);
+                        getValues_editors(см, nod, list);
                         value = nod.props[i].value_editor;
                         state.Break();
                     }

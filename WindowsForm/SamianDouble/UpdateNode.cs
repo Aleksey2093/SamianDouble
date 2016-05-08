@@ -29,29 +29,20 @@ namespace SamianDouble
                     state.Break(); //находим нужный нам нод и выходим из цикла
                 }
             });
-            //теперь нужно добавить связи: исходяющую связь в другой нод и в наш входяющую
-            /*Connect_list con = new Connect_list();
-            con.ID = other_nod.ID;
-            con.Name = other_nod.name;
-            nod.connects_in.Add(con);*/
+
 
             nod.connects_in.Add(other_nod);
             other_nod.connects_out.Add(nod);
-            /*con = new Connect_list();
-            con.ID = nod.id;
-            con.Name = nod.name;
-            other_nod.connect_out.Add(con);*/
-            //связи созданы, теперь нужно добавить дополнительные свойства
-            //кол-во значений свойств увел. в количество раз - кол-во свойств другого нода.
+
+
             for (int j = 0; j < nod.props.Count; j++)
             {
-                double[] vals = new double[nod.props[j].values.Count * other_nod.props.Count];
-                Parallel.For(0, vals.Length, (i, state) =>
+                int pos = 0;
+                Parallel.For(0, nod.props[j].values.Count * other_nod.props.Count-nod.props[j].values.Count, (i, state) =>
                 {
-                    vals[i] = 0.5;
+                    nod.props[j].values.Add(nod.props[j].values[pos]);
+                    pos++;
                 });
-                nod.props[j].values.Clear();
-                nod.props[j].values.AddRange(vals);
             }
             return list;
         }

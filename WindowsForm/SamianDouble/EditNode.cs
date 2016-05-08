@@ -159,7 +159,8 @@ namespace SamianDouble
             GridCellColor[,] gridcell = new GridCellColor[rows, len_columns + 1];
             int i = 0;
             List<Node_struct> list = tmplistnodes;
-            for (i = 0; i < len_columns;i++ )
+
+            for (i = 0; i < len_columns; i++)
             {
                 table.Columns.Add("");
             }
@@ -191,7 +192,7 @@ namespace SamianDouble
             }
             //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
             rows = rows - thisnod.props.Count;
-            if (smej && thisnod.connects_in.Count > 0)
+            //if ((smej && thisnod.connects_in.Count > 0) || dДействие == 1)
             {
                 propсмежность[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
                 for (i = 0; i < rows; i++)
@@ -203,15 +204,15 @@ namespace SamianDouble
                         gridcell[i, j].setvalue(i, j, Color.LightBlue);
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = Color.LightBlue;
                     }
-                };
-                if (mat.Length >= 0 && параметр == true)
+                }
+                if (thisnod.connects_in.Count > 0 || new Node().getProvBoolПроверкаИзвестия(list))//((mat.Length >= 0 && параметр == true) || dДействие == 1)
                 {
+                    list = new NodeValueMathUp().getMathNodesAll(list);
                     table.Columns.Add("Вероятности");
-                    double[] values_p = new NodeValueMathDown().values_editors(mat, thisnod, tmplistnodes);
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
                         gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose);
-                        table.Rows[i + rows]["Вероятности"] = Math.Round(values_p[i], 2);
+                        table.Rows[i + rows]["Вероятности"] = Math.Round(thisnod.props[i].value_editor, 4);
                     }
                     for (i = 0; i < table.Rows.Count; i++)
                         for (j = 0; j < table.Columns.Count; j++)
@@ -615,7 +616,7 @@ namespace SamianDouble
         private void button1Math_Click(object sender, EventArgs e)
         {
             if (Сохр_таблицу_в_узел())
-                UpdateDataGrivTable(true);
+                UpdateDataGrivTable(true);//new NodeValueMathUp().getMathNodesAll(tmplistnodes);
         }
 
         private bool Сохр_таблицу_в_узел()

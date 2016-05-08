@@ -80,7 +80,9 @@ namespace SamianDouble
                                     }
                             prrrr.values.Add(val);
                         }
-                        nod.props.Add(prrrr);
+                        nod.props.Add(prrrr); 
+                        nod.connects_in = new List<Node_struct>();
+                        nod.connects_out = new List<Node_struct>();
                     }
                     if (line.ChildNodes.Count > 2)
                     {
@@ -93,21 +95,26 @@ namespace SamianDouble
                             connecslist.Add(oneconnect);
                         }
                         if (line.ChildNodes[3].Name == "in")
-                            Parallel.ForEach(connecslist, (coni, state) =>
+                        {
+                            foreach(var coni in connecslist)
                                 {
                                     pirtopi p = new pirtopi();
                                     p.one = coni;
                                     p.two = nod.ID;
                                     listconnectnodes.Add(p);
-                                });
+                                }
+                        }
                         else if (line.ChildNodes[3].Name == "out")
-                            Parallel.ForEach(connecslist, (coni, state) =>
+                        {
+                            foreach (var coni in connecslist)
                             {
                                 pirtopi p = new pirtopi();
                                 p.two = coni;
                                 p.one = nod.ID;
                                 listconnectnodes.Add(p);
-                            });
+                            }
+                            nod.connects_out = new List<Node_struct>();
+                        }
                         else
                         {
                             MessageBox.Show("Указанный файл хранит данные неподходящие для приложения. Выберите правильный файл.", "Ошибка",
@@ -115,7 +122,7 @@ namespace SamianDouble
                             return listnodesold;
                         }
                     }
-                    if (line.ChildNodes.Count > 3)
+                    /*if (line.ChildNodes.Count > 30)
                     {
                         List<int> connecslist = new List<int>();
                         int oneconnect;
@@ -127,38 +134,44 @@ namespace SamianDouble
                         }
 
                         if (line.ChildNodes[4].Name == "in")
-                            Parallel.ForEach(connecslist, (coni, state) =>
+                        {
+                            foreach (var coni in connecslist)
                             {
                                 pirtopi p = new pirtopi();
                                 p.one = coni;
                                 p.two = nod.ID;
                                 listconnectnodes.Add(p);
-                            });
+                            }
+                            nod.connects_in = new List<Node_struct>();
+                        }
                         else if (line.ChildNodes[4].Name == "out")
-                            Parallel.ForEach(connecslist, (coni, state) =>
+                        {
+                            foreach (var coni in connecslist)
                             {
                                 pirtopi p = new pirtopi();
                                 p.two = coni;
                                 p.one = nod.ID;
                                 listconnectnodes.Add(p);
-                            });
+                            }
+                            nod.connects_out = new List<Node_struct>();
+                        }
                         else
                         {
                             MessageBox.Show("Указанный файл хранит данные неподходящие для приложения. Выберите правильный файл.", "Ошибка",
                                 MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1);
                             return listnodesold;
                         }
-                    }
+                    }*/
                     listnodes.Add(nod);
                 }
                 Node nodeclass = new Node();
-                Parallel.ForEach(listconnectnodes, (connect) =>
+                foreach(var connect in listconnectnodes)
                     {
-                        Node_struct nodисходит = nodeclass.getNodeПоИд(listnodes, connect.one);
-                        Node_struct nodвходит = nodeclass.getNodeПоИд(listnodes, connect.two);
+                        var nodисходит = nodeclass.getNodeПоИд(listnodes, connect.one);
+                        var nodвходит = nodeclass.getNodeПоИд(listnodes, connect.two);
                         nodисходит.connects_out.Add(nodвходит);
                         nodвходит.connects_in.Add(nodисходит);
-                    });
+                    }
                 if (проверкаЗагруженногоФайла(listnodes))
                     return listnodes;
                 else
@@ -174,6 +187,7 @@ namespace SamianDouble
 
         public bool проверкаЗагруженногоФайла(List<Node_struct> list)
         {
+            return true;
             bool corr = true;
             Node nodeclass = new Node();
             List<string> errrors = new List<string>();
@@ -213,7 +227,7 @@ namespace SamianDouble
                         bool нашли = false;
                         Parallel.ForEach(list, (ot, stateot) =>
                             {
-                                if (ot == conn)
+                                if (ot.ID == conn.ID)
                                 {
                                     нашли = true;
                                     колвознаподм.Add(ot.props.Count);
@@ -237,7 +251,7 @@ namespace SamianDouble
                         bool нашли = false;
                         Parallel.ForEach(list, (ot, stateot) =>
                         {
-                            if (ot == conn)
+                            if (ot.ID == conn.ID)
                             {
                                 нашли = true;
                                 колвознаподм.Add(ot.props.Count);
@@ -264,7 +278,7 @@ namespace SamianDouble
                 });
                 try
                 {
-                    if (колвознаподм[0] == сколькодолжныбытьзначений[0])
+                    if (колвознаподм[0] != сколькодолжныбытьзначений[0])
                     {
                         corr = false;
                         statenod.Break();
@@ -332,14 +346,14 @@ namespace SamianDouble
                 lineslist.Add("\t</in>");
 
 
-                lineslist.Add("\t<out>");
+                /*lineslist.Add("\t<out>");
                 foreach (var connect in nod.connects_out)
                 {
                     lineslist.Add("\t\t<connect>");
                     lineslist.Add("\t\t\t<idcon>" + connect.ID + "</idcon>");
                     lineslist.Add("\t\t</connect>");
                 }
-                lineslist.Add("\t</out>");
+                lineslist.Add("\t</out>");*/
 
 
                 lineslist.Add("\t</node>");

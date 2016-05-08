@@ -221,7 +221,7 @@ namespace SamianDouble
             } else if (e.Button == MouseButtons.Left && e.Node.Level == 2)
             {
                 Node n = new Node();
-                n.nodeFixPropertyThisNod(e.Node, listnodes);
+                n.nodeSetFixPropertyThisNod(e.Node, listnodes);
                 treeListReplace();
                 e.Node.Checked = false;
             }
