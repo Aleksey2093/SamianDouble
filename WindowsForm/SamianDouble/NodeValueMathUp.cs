@@ -11,13 +11,6 @@ namespace SamianDouble
     /// </summary>
     class NodeValueMathUp
     {
-        public struct MatrixСмежная
-        {
-            public Node_struct nod;
-            public Propertys_struct property;
-            public double value;
-        }
-
         private List<Node_struct> startMathDownСначало(List<Node_struct> list)
         {
             NodeValueMathDown mathdown = new NodeValueMathDown();
@@ -26,7 +19,7 @@ namespace SamianDouble
             {
                 if (nod.connects_out.Count == 0 && nod.connects_in.Count > 0)
                 {
-                    EditNode.propсмежность[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
+                    MatrixСмежная[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
                     mathdown.getValues_editors(см, nod, list);
                 }
             });

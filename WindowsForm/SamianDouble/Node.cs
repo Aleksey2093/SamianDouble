@@ -10,47 +10,6 @@ using System.Windows.Forms;
 
 namespace SamianDouble
 {
-    public class Node_struct
-    {
-        private int id;
-        private string name;
-        public List<Propertys_struct> props;
-        public List<Node_struct> connects_in;
-        public List<Node_struct> connects_out;
-
-        public int ID
-        {
-            get { return id; }
-            set { id = value; }
-        }
-        public string Name
-        {
-            get { return name; }
-            set { name = value; }
-        }
-    }
-    /*public class Connect_list
-    {
-        public int conid;
-        public string connodename;
-        public int ID
-        {
-            get { return conid; }
-            set { conid = value; }
-        }
-        public string Name
-        {
-            get { return connodename; }
-            set { connodename = value; }
-        }
-    }*/
-    public class Propertys_struct
-    {
-        public String name;
-        public List<double> values;
-        public double value_editor;
-        public bool proc100 = false;
-    }
     class Node
     {
         public bool getEstProperyTrueFix(List<Propertys_struct> list)
@@ -171,8 +130,11 @@ namespace SamianDouble
                         {
                             Parallel.For(0,ot.props.Count,(j,saww)=>
                             {
-                                for (int i = 0; i < (nownod.props.Count * ot.props[0].values.Count / (nownod.props.Count - 1)) - ot.props[0].values.Count;i++ )
-                                    ot.props[j].values.Add(ot.props[j].values[i]);
+                                int len = (nownod.props.Count * ot.props[0].values.Count / (nownod.props.Count - 1)) 
+                                    - ot.props[0].values.Count;
+                                /*for (int i = 0; i < len;i++ )
+                                    ot.props[j].values.Add(ot.props[j].values[i]);*/
+                                ot.props[j].values.AddRange(ot.props[j].values.GetRange(0,len));
                             });
                         });
                         state.Break();
@@ -199,6 +161,16 @@ namespace SamianDouble
                                 if (nodlist.props[i].name == nod.Text)
                                 {
                                     nodlist.props.RemoveAt(i);
+                                    Parallel.ForEach(nodlist.connects_out, (nodуда, stateудал) =>
+                                        {
+                                            int len = nodlist.props.Count * nodуда.props[0].values.Count / (nodlist.props.Count-1) - nodуда.props[0].values.Count;
+                                            len = nodуда.props[0].values.Count - len + 1;
+                                            foreach (var prprprp in nodуда.props)
+                                            {
+                                                for (int j = 0; j < len; j++)
+                                                    prprprp.values.RemoveAt(0);
+                                            }
+                                        });
                                     stateдва.Break();
                                 }
                             });

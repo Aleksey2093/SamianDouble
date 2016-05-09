@@ -63,6 +63,7 @@
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Структуры и Классы.cs" />
     <Compile Include="NodeValueMathDown.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="NodeValueMathUp.cs" />

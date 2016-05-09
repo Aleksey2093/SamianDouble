@@ -49,25 +49,21 @@ namespace SamianDouble
             this.Text = "EditNode " + thisnod.Name;
         }
 
-        public struct propсмежность
-        {
-            public int id;
-            public string prop_name;
-        }
-
         /// <summary>
         /// возвращает смежную матрицу узлов
         /// </summary>
         /// <param name="colrow">строки - количество связей входящих</param>
         /// <param name="colcol">столбцы - длинна одной линии значений (они все одинаковые должны быть, если не было ошибок)</param>
         /// <returns></returns>
-        public propсмежность[][] getMatrixСмежность(Node_struct tmpinode, int colrow, int colcol, List<Node_struct> listik)
+        public MatrixСмежная[][] getMatrixСмежность(Node_struct tmpinode, int colrow, int colcol, List<Node_struct> listik)
         {
-            propсмежность[][] mat = new propсмежность[colrow][];
-            List<int> idnodes = new List<int>();
+            MatrixСмежная[][] mat = new MatrixСмежная[colrow][];
+            List<Node_struct> idnodes = new List<Node_struct>();
             for (int i = 0; i < colrow; i++)
-                mat[i] = new propсмежность[colcol];
-            Parallel.For(0, listik.Count, (i, state) =>
+            {
+                mat[i] = new MatrixСмежная[colcol];
+            }
+            /*Parallel.For(0, listik.Count, (i, state) =>
                 {
                     for (int j = 0; j < tmpinode.connects_in.Count; j++)
                     {
@@ -76,20 +72,24 @@ namespace SamianDouble
                             idnodes.Add(i);
                         }
                     }
-                });
+                });*/
+               foreach(var nood in tmpinode.connects_in)
+               {
+                   idnodes.Add(nood);
+               }
             //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
             for (int i = colrow - 1, index = 0, h = 1; i >= 0; i--, index++)
             {
                 //цикл движется от последней строки до первой
                 //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
-                int hh = 0; var othnod = listik[idnodes[index]];
+                int hh = 0; var othnod = idnodes[i];
                 for (int j = 0, ij = 0; j < colcol; j++)
                 {
                 ifigoto:
                     if (hh < h)
                     {
-                        mat[i][j].id = othnod.ID;
-                        mat[i][j].prop_name = othnod.props[ij].name;
+                        mat[i][j].nod = othnod;
+                        mat[i][j].property = othnod.props[ij];
                         hh++;
                     }
                     else
@@ -194,12 +194,12 @@ namespace SamianDouble
             rows = rows - thisnod.props.Count;
             //if ((smej && thisnod.connects_in.Count > 0) || dДействие == 1)
             {
-                propсмежность[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
+                MatrixСмежная[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
                 for (i = 0; i < rows; i++)
                 {
                     for (j = 1; j < len_columns; j++)
                     {
-                        table.Rows[i][j] = mat[i][j - 1].prop_name;
+                        table.Rows[i][j] = mat[i][j - 1].property.name;
                         dataGridView1.Rows[i].Cells[j].ReadOnly = true;
                         gridcell[i, j].setvalue(i, j, Color.LightBlue);
                         dataGridView1.Rows[i].Cells[j].Style.BackColor = Color.LightBlue;

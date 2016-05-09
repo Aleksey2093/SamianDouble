@@ -18,7 +18,7 @@ namespace SamianDouble
         /// <param name="nod"></param>
         /// <param name="list"></param>
         /// <returns></returns>
-        public double[] getValues_editors(EditNode.propсмежность[][] смежность, Node_struct nod, List<Node_struct> list)
+        public double[] getValues_editors(MatrixСмежная[][] смежность, Node_struct nod, List<Node_struct> list)
         {
             double[] values = new double[nod.props.Count];
             int n = смежность.Length;
@@ -27,8 +27,8 @@ namespace SamianDouble
             for (int i = 0; i < n; i++)
                 for (int j = 0; j < m; j++)
                 {
-                    int idnod = смежность[i][j].id;
-                    string nameprop = смежность[i][j].prop_name;
+                    Node_struct idnod = смежность[i][j].nod;
+                    Propertys_struct nameprop = смежность[i][j].property;
                     double v1 = getNodPropsValueEditor(list, idnod, nameprop);
                     matrix[i, j] = v1;
                 }
@@ -51,53 +51,35 @@ namespace SamianDouble
             }
             return values;
         }
-        public double getNodPropsValueEditor(List<Node_struct> list, int id, string nameprop)
+        public double getNodPropsValueEditor(List<Node_struct> list, Node_struct nod, Propertys_struct proppppp)
         {
-            Node_struct nod = new Node_struct();
-
-            Parallel.For(0, list.Count, (i, state) =>
-            {
-                if (list[i].ID == id)
-                {
-                    nod = list[i];
-                    state.Break();
-                }
-            });
             double value = -1;
-            Parallel.For(0, nod.props.Count, (i, state) =>
+            bool enab = false;
+            foreach (var propi in nod.props)
             {
-                if (nod.props[i].name == nameprop)
+                if (propi.proc100)
                 {
-                    bool enab = false;
-                    foreach(var propi in nod.props)
-                    {
-                        if (propi.proc100)
-                        {
-                            enab = true;
-                            break;
-                        }
-                    }
-                    if (enab)
-                    {
-                        if (nod.props[i].proc100)
-                            value = 1;
-                        else
-                            value = 0;
-                    }
-                    else if (nod.props[i].values.Count > 1)
-                    {
-                        EditNode.propсмежность[][] см = new EditNode().getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
-                        getValues_editors(см, nod, list);
-                        value = nod.props[i].value_editor;
-                        state.Break();
-                    }
-                    else
-                    {
-                        value = nod.props[i].values[0];
-                        state.Break();
-                    }
+                    enab = true;
+                    break;
                 }
-            });
+            }
+            if (enab)
+            {
+                if (proppppp.proc100)
+                    value = 1;
+                else
+                    value = 0;
+            }
+            else if (proppppp.values.Count > 1)
+            {
+                MatrixСмежная[][] см = new EditNode().getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
+                getValues_editors(см, nod, list);
+                value = proppppp.value_editor;//nod.props[i].value_editor;
+            }
+            else
+            {
+                value = proppppp.values[0];//nod.props[i].values[0];
+            }
             return value;
         }
     }
