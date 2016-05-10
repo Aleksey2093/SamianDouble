@@ -259,5 +259,21 @@ namespace SamianDouble
                 });
             treeListReplace();
         }
+
+        private void новыйToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FileLoadAndSave f = new FileLoadAndSave();
+            if (f.newНовыйФайлПроекта(listnodes))
+            {
+                listnodes.Clear();
+                listnodes = new List<Node_struct>();
+                treeListReplace();
+            }
+        }
+
+        private void настройкиToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

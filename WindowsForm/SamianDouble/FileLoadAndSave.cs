@@ -16,6 +16,39 @@ namespace SamianDouble
             public int two;
         }
 
+        public bool newНовыйФайлПроекта(List<Node_struct> listnodesold)
+        {
+            DialogResult res = MessageBox.Show("Создать новый проект?", "Вопрос", MessageBoxButtons.OK, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+            if (res != DialogResult.Yes)
+                return false;
+            if (listnodesold.Count > 0)
+            {
+                res = MessageBox.Show("У вас уже открыт файл. Сохранить его прежде чем открыть новый?", "Вопрос",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (res == DialogResult.Yes)
+                {
+                    if (!saveToFile(listnodesold))
+                    {
+                    retgoto:
+                        res = MessageBox.Show("Ошибка при сохранении. Повторить попытку или открыть новый файл? " +
+                            "Отказавшись от сохранения текущего проекта, вы рискуете потерять изменения, которые еще не сохранены", "Вопрос",
+                            MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                        if (res == DialogResult.Yes && saveToFile(listnodesold) == false)
+                            goto retgoto;
+                    }
+                }
+                else
+                {
+                retelse:
+                    res = MessageBox.Show("Отказавшись от сохранения текущего проекта, вы рискуете потерять изменения, которые еще не сохранены. Сохранить открытый проект?", "Вопрос",
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button1);
+                    if (res == DialogResult.Yes && saveToFile(listnodesold) == false)
+                        goto retelse;
+                }
+            }
+            return true;
+        }
+
         public List<Node_struct> loadFife(List<Node_struct> listnodesold)
         {
             try
