@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
 
 namespace SamianDouble
 {
@@ -45,8 +46,9 @@ namespace SamianDouble
             listBox3OtherNode.ValueMember = "ID";
             listBox3OtherNode.DataSource = othernods;
 
-            UpdateDataGrivTable(false);
             this.Text = "EditNode " + thisnod.Name;
+
+            UpdateDataGrivTable(true);
         }
 
         /// <summary>
@@ -63,20 +65,12 @@ namespace SamianDouble
             {
                 mat[i] = new MatrixСмежная[colcol];
             }
-            /*Parallel.For(0, listik.Count, (i, state) =>
-                {
-                    for (int j = 0; j < tmpinode.connects_in.Count; j++)
-                    {
-                        if (tmpinode.connects_in[j].ID == listik[i].ID)
-                        {
-                            idnodes.Add(i);
-                        }
-                    }
-                });*/
-               foreach(var nood in tmpinode.connects_in)
-               {
+            foreach(var nood in tmpinode.connects_in)
+            {
                    idnodes.Add(nood);
-               }
+            }
+            if (idnodes.Count == 0)
+                return mat;
             //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
             for (int i = colrow - 1, index = 0, h = 1; i >= 0; i--, index++)
             {
@@ -111,123 +105,106 @@ namespace SamianDouble
             //получили верхнюю часть матрицы смежности поидее в нужном нам виде.
             return mat;
         }
-
-        public struct GridCellColor
-        {
-            private int r;
-            private int c;
-            private Color colorback;
-            public bool setvalue(int i, int j, Color color)
-            {
-                r = i;
-                c = j;
-                colorback = color;
-                return true;
-            }
-            public int rows
-            {
-                get {
-                    return r;
-                }
-            }
-            public int cell
-            {
-                get {return c;}
-            }
-            public Color color
-            {
-                get { return colorback; }
-            }
-        };
-
+        public static bool thhhhreadактивити = false;
         private void UpdateDataGrivTable(bool параметр)
         {
-            DataTable table = new DataTable(); bool smej = false;
-            dataGridView1.DataSource = null;
-            dataGridView1.DataSource = table;
-            dataGridView1.ColumnHeadersVisible = false;
-            int len_columns = thisnod.props[0].values.Count + 1, rows;
-            try
-            {
-                rows = thisnod.props.Count + thisnod.connects_in.Count;
-                smej = true;
-            }
-            catch
-            {
-                rows = thisnod.props.Count;
-            }
-            GridCellColor[,] gridcell = new GridCellColor[rows, len_columns + 1];
-            int i = 0;
-            List<Node_struct> list = tmplistnodes;
+            Thread thread = new Thread(delegate()
+                {
+                    int попытки = 0;
+                    retaw:
+                    if (thhhhreadактивити == true)
+                    {
+                        попытки++;
+                        if (попытки > 10)
+                            return;
+                        Thread.Sleep(1000);
+                        goto retaw;
+                    }
+                    else
+                        thhhhreadактивити = true;
+                    DataTable table = new DataTable();
+                    int len_columns = thisnod.props[0].values.Count + 1, rows;
+                    try
+                    {
+                        rows = thisnod.props.Count + thisnod.connects_in.Count;
+                    }
+                    catch
+                    {
+                        rows = thisnod.props.Count;
+                    }
+                    GridCellColor[,] gridcell = new GridCellColor[rows, len_columns + 1];
+                    int i = 0;
+                    List<Node_struct> list = tmplistnodes;
 
-            for (i = 0; i < len_columns; i++)
-            {
-                table.Columns.Add("");
-            }
-            for (i = 0; i < thisnod.connects_in.Count; i++)
-            {
-                int id = thisnod.connects_in[i].ID;
-                for (int k = 0; k < list.Count; k++)
-                {
-                    if (id == list[i].ID)
+                    for (i = 0; i < len_columns; i++)
                     {
-                        id = i;
-                        break;
+                        table.Columns.Add("");
                     }
-                }
-                table.Rows.Add();
-                table.Rows[i][0] = list[id].Name;
-                dataGridView1.Rows[i].Cells[0].ReadOnly = true;
-                gridcell[i, 0].setvalue(i, 0, Color.Red);
-                dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.Red;
-            }
-            int j = 0;
-            for (i = i + 0, j = 0; i < rows; i++, j++)
-            {
-                table.Rows.Add();
-                table.Rows[i][0] = thisnod.props[j].name;
-                dataGridView1.Rows[i].Cells[0].ReadOnly = true;
-                gridcell[i, 0].setvalue(i, 0, Color.LightGreen);
-                dataGridView1.Rows[i].Cells[0].Style.BackColor = Color.LightGreen;
-            }
-            //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
-            rows = rows - thisnod.props.Count;
-            //if ((smej && thisnod.connects_in.Count > 0) || dДействие == 1)
-            {
-                MatrixСмежная[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
-                for (i = 0; i < rows; i++)
-                {
-                    for (j = 1; j < len_columns; j++)
+                    for (i = 0; i < thisnod.connects_in.Count; i++)
                     {
-                        table.Rows[i][j] = mat[i][j - 1].property.name;
-                        dataGridView1.Rows[i].Cells[j].ReadOnly = true;
-                        gridcell[i, j].setvalue(i, j, Color.LightBlue);
-                        dataGridView1.Rows[i].Cells[j].Style.BackColor = Color.LightBlue;
+                        int id = thisnod.connects_in[i].ID;
+                        for (int k = 0; k < list.Count; k++)
+                        {
+                            if (id == list[i].ID)
+                            {
+                                id = i;
+                                break;
+                            }
+                        }
+                        table.Rows.Add();
+                        table.Rows[i][0] = list[id].Name;
+                        gridcell[i, 0].setvalue(i, 0, Color.Red, true);
                     }
-                }
-                if (thisnod.connects_in.Count > 0 || new Node().getProvBoolПроверкаИзвестия(list))//((mat.Length >= 0 && параметр == true) || dДействие == 1)
-                {
-                    list = new NodeValueMathUp().getMathNodesAll(list);
-                    table.Columns.Add("Вероятности");
+                    int j = 0;
+                    for (i = i + 0, j = 0; i < rows; i++, j++)
+                    {
+                        table.Rows.Add();
+                        table.Rows[i][0] = thisnod.props[j].name;
+                        gridcell[i, 0].setvalue(i, 0, Color.LightGreen, true);
+                    }
+                    //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
+                    rows = rows - thisnod.props.Count;
+
+                    MatrixСмежная[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
+                    for (i = 0; i < rows; i++)
+                    {
+                        for (j = 1; j < len_columns; j++)
+                        {
+                            table.Rows[i][j] = mat[i][j - 1].property.name;
+                            gridcell[i, j].setvalue(i, j, Color.LightBlue, true);
+                        }
+                    }
+                    if (thisnod.connects_in.Count > 0 || new Node().getProvBoolПроверкаИзвестия(list))
+                    {
+                        table.Columns.Add("Вероятности");
+                        for (i = 0; i < thisnod.props.Count; i++)
+                        {
+                            gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose, true);
+                            table.Rows[i + rows]["Вероятности"] = Math.Round(thisnod.props[i].value_editor, 4);
+                        }
+                    }
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
-                        gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose);
-                        table.Rows[i + rows]["Вероятности"] = Math.Round(thisnod.props[i].value_editor, 4);
-                    }
-                    for (i = 0; i < table.Rows.Count; i++)
-                        for (j = 0; j < table.Columns.Count; j++)
+                        for (j = 0; j < thisnod.props[i].values.Count; j++)
                         {
-                            dataGridView1.Rows[i].Cells[j].Style.BackColor = gridcell[i, j].color;
+                            table.Rows[i + rows][j + 1] = thisnod.props[i].values[j];
                         }
-                }
-            }
-            for (i = 0; i < thisnod.props.Count; i++)
-            {
-                for (j = 0; j < thisnod.props[i].values.Count; j++)
-                {
-                    table.Rows[i + rows][j + 1] = thisnod.props[i].values[j];
-                }
-            }
+                    }
+                    Invoke(new MethodInvoker(() =>
+                        {
+                            dataGridView1.DataSource = null;
+                            dataGridView1.DataSource = table;
+                            dataGridView1.ColumnHeadersVisible = false;
+                            for (i = 0; i < table.Rows.Count; i++)
+                                for (j = 0; j < table.Columns.Count; j++)
+                                {
+                                    dataGridView1.Rows[i].Cells[j].Style.BackColor = gridcell[i, j].color;
+                                }
+                        }));
+                    thhhhreadактивити = false;
+                });
+            thread.Name = "Выполняетс расчет";
+            thread.Start();
         }
         /// <summary>
         /// загружает список узлов с которыми нет связи.
@@ -240,13 +217,9 @@ namespace SamianDouble
             List<Node_struct> list = tmplistnodes;
             Parallel.For(0, list.Count, (i, state) =>
             {
-                bool ifi = true;
-                if (list[i].ID == thisnod.ID)
-                    ifi = false;
-                else if (ifi)
+                if (list[i].ID != thisnod.ID)
                 {
-                    ifi = getProvConnectNodeToNode(list[i]);
-                    if (ifi)
+                    if (getProvConnectNodeToNode(list[i]))
                     {
                         Othernode ot = new Othernode();
                         ot.Node = list[i];
@@ -259,15 +232,14 @@ namespace SamianDouble
 
         private bool getProvConnectNodeToNode(Node_struct nodes_struct)
         {
-            bool ifi = true;
+            bool[] ifi = new bool[] { true, true, true };
             Parallel.Invoke(
                 () =>
                 {
                     for (int i = 0; i < thisnod.connects_in.Count; i++)
                         if (thisnod.connects_in[i].ID == nodes_struct.ID)
                         {
-                            //return false;
-                            ifi = false;
+                            ifi[0] = false;
                             break;
                         }
                 },
@@ -276,12 +248,18 @@ namespace SamianDouble
                         for (int i = 0; i < thisnod.connects_out.Count; i++)
                             if (thisnod.connects_out[i].ID == nodes_struct.ID)
                             {
-                                //return false;
-                                ifi = false;
+                                ifi[1] = false;
                                 break;
                             }
+                    },
+                    () =>
+                    {
+                        ifi[2] = new Node().getProvBoolЗацикленность(tmplistnodes, thisnod, nodes_struct, true, true);
                     });
-            return true;
+            if (ifi[0] && ifi[1] && !ifi[2])
+                return true;
+            else
+                return false;
         }
 
         private void EditNode_FormClosing(object sender, FormClosingEventArgs e)
@@ -311,7 +289,7 @@ namespace SamianDouble
                 ListBox lbl = (ListBox)sender;
                 int id = (int)listBox2ConnectOut.SelectedValue;
                 string name = lbl.Text.ToString();
-                lbl.DoDragDrop("1" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
+                lbl.DoDragDrop("2" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
             }
             catch (Exception ex)
             {
@@ -326,7 +304,7 @@ namespace SamianDouble
                 ListBox lbl = (ListBox)sender;
                 int id = (int)listBox1ConnectIn.SelectedValue;
                 string name = lbl.Text.ToString();
-                lbl.DoDragDrop("2" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
+                lbl.DoDragDrop("1" + id + " " + name, DragDropEffects.Copy | DragDropEffects.Move);
             }
             catch (Exception ex)
             {
@@ -334,13 +312,23 @@ namespace SamianDouble
             }
         }
 
+        private void listBox1ConnectIn_DragDrop(object sender, DragEventArgs e)
+        {
+            listBoxПеретаскивание(e, 1);
+        }
+        
         private void listBox2ConnectOut_DragDrop(object sender, DragEventArgs e)
         {
-            Node nodeclass = new Node();
-            string name = e.Data.GetData(DataFormats.Text).ToString();
-            int what = int.Parse(name.Substring(0, 1));
-            if (what == 1)
-                return;
+            listBoxПеретаскивание(e, 2);
+        }
+
+        private void listBox3OtherNode_DragDrop(object sender, DragEventArgs e)
+        {
+            listBoxПеретаскивание(e, 0);
+        }
+
+        private Othernode nodКоторыйПеретаскивается(String name, int wh, Node nodeclass)
+        {
             name = name.Remove(0, 1);
             int id = -1;
             for (int i = 0; i < name.Length; i++)
@@ -353,80 +341,78 @@ namespace SamianDouble
                 }
             }
             if (id == -1)
-                return;
-            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, nodeclass.getNodeПоИд(tmplistnodes,id), true, false))
-            {
-                return;
-            }
-            UpdateNode ap = new UpdateNode();
-            for (int i = 0; i < thisnod.connects_in.Count; i++)
-                if (id == thisnod.connects_in[i].ID)
-                {
-                    if (what == 1) //out
-                    {
-                        tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
-                    }
-                    else if (what == 2) //in
-                    {
-                        tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
-                    }
+                return null;
+            Node_struct nod = nodeclass.getNodeПоИд(tmplistnodes, id);
+            Othernode ot = new Othernode();
+            ot.Node = nod;
+            return ot;
+        }
 
-                    Parallel.For(0, tmplistnodes.Count, (j, state) =>
-                    {
-                        if (tmplistnodes[j].ID == thisnod.ID)
-                        {
-                            thisnod = tmplistnodes[j];
-                            state.Break();
-                        }
-                    });
-                    if (what == 1) //out
-                    {
-                        listBox2ConnectOut.DataSource = null;
-                        listBox2ConnectOut.DisplayMember = "Name";
-                        listBox2ConnectOut.ValueMember = "ID";
-                        listBox2ConnectOut.DataSource = thisnod.connects_out;
-                    }
-                    else if (what == 2)
-                    {
-                        listBox1ConnectIn.DataSource = null;
-                        listBox1ConnectIn.DisplayMember = "Name";
-                        listBox1ConnectIn.ValueMember = "ID";
-                        listBox1ConnectIn.DataSource = thisnod.connects_in;
-                    }
-                    UpdateDataGrivTable(false);
-                    //return;
-                }
-            for (int i = 0; i < thisnod.connects_out.Count; i++)
-                if (id == thisnod.connects_out[i].ID)
-                    return;
-            for (int i = 0; i < othernods.Count; i++)
-                if (id == othernods[i].ID)
-                {
-                    othernods.RemoveAt(i);
-                    break;
-                }
-            listBox3OtherNode.DataSource = null;
-            listBox3OtherNode.DisplayMember = "Name";
-            listBox3OtherNode.ValueMember = "ID";
-            listBox3OtherNode.DataSource = othernods;
-
-            tmplistnodes = ap.updateNodeConnectOut(tmplistnodes, thisnod, id);
-
-            Parallel.For(0, tmplistnodes.Count, (i, state) =>
-                {
-                    if (tmplistnodes[i].ID == thisnod.ID)
-                    {
-                        thisnod = tmplistnodes[i];
-                        state.Break();
-                    }
-                });
+        private void updateListBoxПослеПерестаскивания()
+        {
+            listBox1ConnectIn.DataSource = null;
+            listBox1ConnectIn.DisplayMember = "Name";
+            listBox1ConnectIn.ValueMember = "ID";
+            listBox1ConnectIn.DataSource = thisnod.connects_in;
 
             listBox2ConnectOut.DataSource = null;
             listBox2ConnectOut.DisplayMember = "Name";
             listBox2ConnectOut.ValueMember = "ID";
             listBox2ConnectOut.DataSource = thisnod.connects_out;
 
-            UpdateDataGrivTable(false);
+            listBox3OtherNode.DataSource = null;
+            listBox3OtherNode.DisplayMember = "Name";
+            listBox3OtherNode.ValueMember = "ID";
+            listBox3OtherNode.DataSource = othernods;
+        }
+
+        private void listBoxПеретаскивание(DragEventArgs e, int idlistbox)
+        {
+            string name = e.Data.GetData(DataFormats.Text).ToString();
+            int what = int.Parse(name.Substring(0, 1));
+            if (what == idlistbox)
+                return;
+            Node nodeclass = new Node();
+            UpdateNode upnode = new UpdateNode();
+            Othernode othernod = nodКоторыйПеретаскивается(name, idlistbox, nodeclass);
+            if (othernod == null)
+                return;
+            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, othernod.Node, true, true))
+                return;
+            if (idlistbox == 1)
+            {
+                tmplistnodes = upnode.updateNodeConnectIn(tmplistnodes, thisnod, othernod.ID);
+                if (what == 2)
+                    tmplistnodes = upnode.deleteNodeConnectOut(tmplistnodes, thisnod, othernod.ID);
+            }
+            else if (idlistbox == 2)
+            {
+                tmplistnodes = upnode.updateNodeConnectOut(tmplistnodes, thisnod, othernod.ID);
+                if (what == 1)
+                    tmplistnodes = upnode.deleteNodeConnectIn(tmplistnodes, thisnod, othernod.ID);
+            }
+            else
+            {
+                othernods.Add(othernod);
+                if (what == 1)
+                    tmplistnodes = upnode.deleteNodeConnectIn(tmplistnodes, thisnod, othernod.ID);
+                else
+                    tmplistnodes = upnode.deleteNodeConnectOut(tmplistnodes, thisnod, othernod.ID);
+            }
+            if (what == 0)
+            {
+                Parallel.For(0, othernods.Count, (i, state) =>
+                    {
+                        if (othernods[i].ID == othernod.ID)
+                        {
+                            othernods.RemoveAt(i);
+                            state.Break();
+                        }
+                    });
+            }
+            //если нужно будет обновить thisnod;
+            updateListBoxПослеПерестаскивания();
+            UpdateDataGrivTable(true);
         }
 
         private void listBox2ConnectOut_DragEnter(object sender, DragEventArgs e)
@@ -434,175 +420,9 @@ namespace SamianDouble
             e.Effect = DragDropEffects.Copy;
         }
 
-        private void listBox1ConnectIn_DragDrop(object sender, DragEventArgs e)
-        {
-            Node nodeclass = new Node();
-            string name = e.Data.GetData(DataFormats.Text).ToString();
-            int what = int.Parse(name.Substring(0, 1));
-            if (what == 2)
-                return;
-            name = name.Remove(0, 1);
-            int id = -1;
-            for (int i = 0; i < name.Length; i++)
-            {
-                if (name[i] == ' ')
-                {
-                    id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i + 1);
-                    break;
-                }
-            }
-            if (id == -1)
-                return;
-            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, nodeclass.getNodeПоИд(tmplistnodes, id), true, false))
-                return;
-            UpdateNode ap = new UpdateNode();
-            for (int i = 0; i < thisnod.connects_out.Count; i++)
-                if (id == thisnod.connects_out[i].ID)
-                {
-                    if (what == 1) //out
-                    {
-                        tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
-                    }
-                    else if (what == 2) //in
-                    {
-                        tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
-                    }
-
-                    Parallel.For(0, tmplistnodes.Count, (j, state) =>
-                    {
-                        if (tmplistnodes[j].ID == thisnod.ID)
-                        {
-                            thisnod = tmplistnodes[j];
-                            state.Break();
-                        }
-                    });
-                    if (what == 1) //out
-                    {
-                        listBox2ConnectOut.DataSource = null;
-                        listBox2ConnectOut.DisplayMember = "Name";
-                        listBox2ConnectOut.ValueMember = "ID";
-                        listBox2ConnectOut.DataSource = thisnod.connects_out;
-                    }
-                    else if (what == 2)
-                    {
-                        listBox1ConnectIn.DataSource = null;
-                        listBox1ConnectIn.DisplayMember = "Name";
-                        listBox1ConnectIn.ValueMember = "ID";
-                        listBox1ConnectIn.DataSource = thisnod.connects_in;
-                    }
-                    UpdateDataGrivTable(false);
-                    //return;
-                }
-            for (int i = 0; i < thisnod.connects_in.Count; i++)
-                if (id == thisnod.connects_in[i].ID)
-                    return;
-
-            for (int i = 0; i < othernods.Count; i++)
-                if (id == othernods[i].ID)
-                {
-                    othernods.RemoveAt(i);
-                    break;
-                }
-            listBox3OtherNode.DataSource = null;
-            listBox3OtherNode.DisplayMember = "Name";
-            listBox3OtherNode.ValueMember = "ID";
-            listBox3OtherNode.DataSource = othernods;
-
-            tmplistnodes = ap.updateNodeConnectIn(tmplistnodes, thisnod, id);
-
-            Parallel.For(0, tmplistnodes.Count, (i, state) =>
-            {
-                if (tmplistnodes[i].ID == thisnod.ID)
-                {
-                    thisnod = tmplistnodes[i];
-                    state.Break();
-                }
-            });
-
-            listBox1ConnectIn.DataSource = null;
-            listBox1ConnectIn.DisplayMember = "Name";
-            listBox1ConnectIn.ValueMember = "ID";
-            listBox1ConnectIn.DataSource = thisnod.connects_in;
-
-            UpdateDataGrivTable(false);
-        }
-
         private void listBox1ConnectIn_DragEnter(object sender, DragEventArgs e)
         {
             e.Effect = DragDropEffects.Copy;
-        }
-
-        private void listBox3OtherNode_DragDrop(object sender, DragEventArgs e)
-        {
-            string name = e.Data.GetData(DataFormats.Text).ToString();
-            int id = -1, what = int.Parse(name.Substring(0, 1));
-            if (what == 0)
-                return;
-            name = name.Remove(0, 1);
-            for (int i = 0; i < name.Length; i++)
-            {
-                if (name[i] == ' ')
-                {
-                    id = int.Parse(name.Substring(0, i));
-                    name = name.Remove(0, i + 1);
-                    break;
-                }
-            }
-
-            if (what != 1 && what != 2)
-                return;
-            if (id == -1)
-                return;
-            for (int i = 0; i < othernods.Count; i++)
-            {
-                if (id == othernods[i].ID)
-                    return;
-            }
-
-            Othernode ot = new Othernode();
-            ot.ID = id;
-            ot.Name = name;
-            othernods.Add(ot);
-
-            listBox3OtherNode.DataSource = null;
-            listBox3OtherNode.DisplayMember = "Name";
-            listBox3OtherNode.ValueMember = "ID";
-            listBox3OtherNode.DataSource = othernods;
-
-            UpdateNode ap = new UpdateNode();
-            if (what == 1) //out
-            {
-                tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
-            }
-            else if (what == 2) //in
-            {
-                tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
-            }
-
-            Parallel.For(0, tmplistnodes.Count, (i, state) =>
-            {
-                if (tmplistnodes[i].ID == thisnod.ID)
-                {
-                    thisnod = tmplistnodes[i];
-                    state.Break();
-                }
-            });
-            if (what == 1) //out
-            {
-                listBox2ConnectOut.DataSource = null;
-                listBox2ConnectOut.DisplayMember = "Name";
-                listBox2ConnectOut.ValueMember = "ID";
-                listBox2ConnectOut.DataSource = thisnod.connects_out;
-            }
-            else if (what == 2)
-            {
-                listBox1ConnectIn.DataSource = null;
-                listBox1ConnectIn.DisplayMember = "Name";
-                listBox1ConnectIn.ValueMember = "ID";
-                listBox1ConnectIn.DataSource = thisnod.connects_in;
-            }
-            UpdateDataGrivTable(false);
         }
 
         private void listBox3OtherNode_DragEnter(object sender, DragEventArgs e)

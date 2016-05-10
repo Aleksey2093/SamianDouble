@@ -1,0 +1,259 @@
+        private void listBox1ConnectIn_DragDrop(object sender, DragEventArgs e)
+        {
+            Node nodeclass = new Node();
+            string name = e.Data.GetData(DataFormats.Text).ToString();
+            int what = int.Parse(name.Substring(0, 1));
+            if (what == 2)
+                return;
+            name = name.Remove(0, 1);
+            int id = -1;
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (name[i] == ' ')
+                {
+                    id = int.Parse(name.Substring(0, i));
+                    name = name.Remove(0, i + 1);
+                    break;
+                }
+            }
+            if (id == -1)
+                return;
+            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, nodeclass.getNodeПоИд(tmplistnodes, id), true, false))
+                return;
+            UpdateNode ap = new UpdateNode();
+            for (int i = 0; i < thisnod.connects_out.Count; i++)
+                if (id == thisnod.connects_out[i].ID)
+                {
+                    if (what == 1) //out
+                    {
+                        tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
+                    }
+                    else if (what == 2) //in
+                    {
+                        tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
+                    }
+
+                    Parallel.For(0, tmplistnodes.Count, (j, state) =>
+                    {
+                        if (tmplistnodes[j].ID == thisnod.ID)
+                        {
+                            thisnod = tmplistnodes[j];
+                            state.Break();
+                        }
+                    });
+                    if (what == 1) //out
+                    {
+                        listBox2ConnectOut.DataSource = null;
+                        listBox2ConnectOut.DisplayMember = "Name";
+                        listBox2ConnectOut.ValueMember = "ID";
+                        listBox2ConnectOut.DataSource = thisnod.connects_out;
+                    }
+                    else if (what == 2)
+                    {
+                        listBox1ConnectIn.DataSource = null;
+                        listBox1ConnectIn.DisplayMember = "Name";
+                        listBox1ConnectIn.ValueMember = "ID";
+                        listBox1ConnectIn.DataSource = thisnod.connects_in;
+                    }
+                    UpdateDataGrivTable(false);
+                    //return;
+                }
+            for (int i = 0; i < thisnod.connects_in.Count; i++)
+                if (id == thisnod.connects_in[i].ID)
+                    return;
+
+            for (int i = 0; i < othernods.Count; i++)
+                if (id == othernods[i].ID)
+                {
+                    othernods.RemoveAt(i);
+                    break;
+                }
+            listBox3OtherNode.DataSource = null;
+            listBox3OtherNode.DisplayMember = "Name";
+            listBox3OtherNode.ValueMember = "ID";
+            listBox3OtherNode.DataSource = othernods;
+
+            tmplistnodes = ap.updateNodeConnectIn(tmplistnodes, thisnod, id);
+
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+            {
+                if (tmplistnodes[i].ID == thisnod.ID)
+                {
+                    thisnod = tmplistnodes[i];
+                    state.Break();
+                }
+            });
+
+            listBox1ConnectIn.DataSource = null;
+            listBox1ConnectIn.DisplayMember = "Name";
+            listBox1ConnectIn.ValueMember = "ID";
+            listBox1ConnectIn.DataSource = thisnod.connects_in;
+
+            UpdateDataGrivTable(false);
+        }
+        
+        private void listBox2ConnectOut_DragDrop(object sender, DragEventArgs e)
+        {
+            Node nodeclass = new Node();
+            string name = e.Data.GetData(DataFormats.Text).ToString();
+            int what = int.Parse(name.Substring(0, 1));
+            if (what == 1)
+                return;
+            name = name.Remove(0, 1);
+            int id = -1;
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (name[i] == ' ')
+                {
+                    id = int.Parse(name.Substring(0, i));
+                    name = name.Remove(0, i + 1);
+                    break;
+                }
+            }
+            if (id == -1)
+                return;
+            if (nodeclass.getProvBoolЗацикленность(tmplistnodes, thisnod, nodeclass.getNodeПоИд(tmplistnodes,id), true, false))
+            {
+                return;
+            }
+            UpdateNode ap = new UpdateNode();
+            for (int i = 0; i < thisnod.connects_in.Count; i++)
+                if (id == thisnod.connects_in[i].ID)
+                {
+                    if (what == 1) //out
+                    {
+                        tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
+                    }
+                    else if (what == 2) //in
+                    {
+                        tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
+                    }
+
+                    Parallel.For(0, tmplistnodes.Count, (j, state) =>
+                    {
+                        if (tmplistnodes[j].ID == thisnod.ID)
+                        {
+                            thisnod = tmplistnodes[j];
+                            state.Break();
+                        }
+                    });
+                    if (what == 1) //out
+                    {
+                        listBox2ConnectOut.DataSource = null;
+                        listBox2ConnectOut.DisplayMember = "Name";
+                        listBox2ConnectOut.ValueMember = "ID";
+                        listBox2ConnectOut.DataSource = thisnod.connects_out;
+                    }
+                    else if (what == 2)
+                    {
+                        listBox1ConnectIn.DataSource = null;
+                        listBox1ConnectIn.DisplayMember = "Name";
+                        listBox1ConnectIn.ValueMember = "ID";
+                        listBox1ConnectIn.DataSource = thisnod.connects_in;
+                    }
+                    UpdateDataGrivTable(false);
+                }
+            for (int i = 0; i < thisnod.connects_out.Count; i++)
+                if (id == thisnod.connects_out[i].ID)
+                    return;
+            for (int i = 0; i < othernods.Count; i++)
+                if (id == othernods[i].ID)
+                {
+                    othernods.RemoveAt(i);
+                    break;
+                }
+            listBox3OtherNode.DataSource = null;
+            listBox3OtherNode.DisplayMember = "Name";
+            listBox3OtherNode.ValueMember = "ID";
+            listBox3OtherNode.DataSource = othernods;
+
+            tmplistnodes = ap.updateNodeConnectOut(tmplistnodes, thisnod, id);
+
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+                {
+                    if (tmplistnodes[i].ID == thisnod.ID)
+                    {
+                        thisnod = tmplistnodes[i];
+                        state.Break();
+                    }
+                });
+
+            listBox2ConnectOut.DataSource = null;
+            listBox2ConnectOut.DisplayMember = "Name";
+            listBox2ConnectOut.ValueMember = "ID";
+            listBox2ConnectOut.DataSource = thisnod.connects_out;
+
+            UpdateDataGrivTable(false);
+        }
+
+        private void listBox3OtherNode_DragDrop(object sender, DragEventArgs e)
+        {
+            string name = e.Data.GetData(DataFormats.Text).ToString();
+            int id = -1, what = int.Parse(name.Substring(0, 1));
+            if (what == 0)
+                return;
+            name = name.Remove(0, 1);
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (name[i] == ' ')
+                {
+                    id = int.Parse(name.Substring(0, i));
+                    name = name.Remove(0, i + 1);
+                    break;
+                }
+            }
+
+            if (what != 1 && what != 2)
+                return;
+            if (id == -1)
+                return;
+            for (int i = 0; i < othernods.Count; i++)
+            {
+                if (id == othernods[i].ID)
+                    return;
+            }
+
+            Othernode ot = new Othernode();
+            ot.ID = id;
+            ot.Name = name;
+            othernods.Add(ot);
+
+            listBox3OtherNode.DataSource = null;
+            listBox3OtherNode.DisplayMember = "Name";
+            listBox3OtherNode.ValueMember = "ID";
+            listBox3OtherNode.DataSource = othernods;
+
+            UpdateNode ap = new UpdateNode();
+            if (what == 1) //out
+            {
+                tmplistnodes = ap.deleteNodeConnectOut(tmplistnodes, thisnod, id);
+            }
+            else if (what == 2) //in
+            {
+                tmplistnodes = ap.deleteNodeConnectIn(tmplistnodes, thisnod, id);
+            }
+
+            Parallel.For(0, tmplistnodes.Count, (i, state) =>
+            {
+                if (tmplistnodes[i].ID == thisnod.ID)
+                {
+                    thisnod = tmplistnodes[i];
+                    state.Break();
+                }
+            });
+            if (what == 1) //out
+            {
+                listBox2ConnectOut.DataSource = null;
+                listBox2ConnectOut.DisplayMember = "Name";
+                listBox2ConnectOut.ValueMember = "ID";
+                listBox2ConnectOut.DataSource = thisnod.connects_out;
+            }
+            else if (what == 2)
+            {
+                listBox1ConnectIn.DataSource = null;
+                listBox1ConnectIn.DisplayMember = "Name";
+                listBox1ConnectIn.ValueMember = "ID";
+                listBox1ConnectIn.DataSource = thisnod.connects_in;
+            }
+            UpdateDataGrivTable(false);
+        }

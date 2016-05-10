@@ -265,7 +265,7 @@ namespace SamianDouble
         /// <param name="list">Список уздлв</param>
         /// <param name="nod">узел текущий</param>
         /// <param name="idconnect">ид узла с которым устанавливается связь</param>
-        /// <param name="forback">в какую сторону связь true к детям, false - к родителям</param>
+        /// <param name="forback">в какую сторону связь true - к детям, false - к родителям</param>
         /// <param name="ignorforback">игнорирования параметра направления проверки</param>
         /// <returns></returns>
         public bool getProvBoolЗацикленность(List<Node_struct> list, Node_struct nod, Node_struct friend, bool forback, bool ignorforback)

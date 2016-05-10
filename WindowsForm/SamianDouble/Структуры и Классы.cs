@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,21 +26,6 @@ namespace SamianDouble
             set { name = value; }
         }
     }
-    /*public class Connect_list
-    {
-        public int conid;
-        public string connodename;
-        public int ID
-        {
-            get { return conid; }
-            set { conid = value; }
-        }
-        public string Name
-        {
-            get { return connodename; }
-            set { connodename = value; }
-        }
-    }*/
     public class Propertys_struct
     {
         public String name;
@@ -68,5 +54,58 @@ namespace SamianDouble
             get { return value1; }
             set { value1 = value; }
         }
-    }
+    };
+    /// <summary>
+    /// Цвета ячеек в datagridview
+    /// </summary>
+    public struct GridCellColor
+    {
+        private int r;
+        private int c;
+        private Color colorback;
+        private bool read;
+        /// <summary>
+        /// установить значения
+        /// </summary>
+        /// <param name="i">строка</param>
+        /// <param name="j">столбец</param>
+        /// <param name="color">цвет</param>
+        /// <param name="re">ReadOnly</param>
+        /// <returns></returns>
+        public bool setvalue(int i, int j, Color color, bool re)
+        {
+            r = i;
+            c = j;
+            colorback = color;
+            read = re;
+            return true;
+        }
+
+        /// <summary>
+        /// вернуть значение строки
+        /// </summary>
+        public int rows
+        {
+            get { return r; }
+        }
+
+        /// <summary>
+        /// вернуть значение столбца
+        /// </summary>
+        public int cell
+        {
+            get { return c; }
+        }
+        /// <summary>
+        /// вернуть цвет
+        /// </summary>
+        public Color color
+        {
+            get { return colorback; }
+        }
+        public bool ReadOnly
+        {
+            get { return read; }
+        }
+    };
 }

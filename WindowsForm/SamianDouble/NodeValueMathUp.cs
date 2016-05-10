@@ -97,7 +97,8 @@ namespace SamianDouble
         private Node_struct MathДетейПоИзвестномуРодителю(Node_struct nod, List<Node_struct> list)
         {
             int rows = -1, column = -1;
-            Parallel.Invoke(() => { rows = getMatСмежКолСтрок(nod); }, () => { column = getMatCмежКолСтолбцов(nod); });
+            Parallel.Invoke(
+                () => { rows = getMatСмежКолСтрок(nod); }, () => { column = getMatCмежКолСтолбцов(nod); });
             if (rows == -1 || column == -1)
             {
                 Console.WriteLine("-------------------------------------------");

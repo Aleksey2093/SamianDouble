@@ -74,7 +74,7 @@ namespace SamianDouble
             for (int j = 0; j < other_nod.props.Count; j++)
             {
                 //List<double> vals = nod.props[j].values; //изначальное количество и значения до увеличения значений данного свойства
-                double[] vals = new double[nod.props[j].values.Count * other_nod.props.Count];
+                double[] vals = new double[nod.props.Count * other_nod.props[j].values.Count];
                 Parallel.For(0, vals.Length, (i, state) =>
                 {
                     vals[i] = 0.5;
