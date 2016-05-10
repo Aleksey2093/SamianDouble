@@ -110,7 +110,9 @@ namespace SamianDouble
         {
             Thread thread = new Thread(delegate()
                 {
-                    int попытки = 0;
+                    DateTime time1 = DateTime.Now;
+                    Node nodeclass = new Node();
+                    int попытки = 0; bool вероятностьстолбец = false;
                     retaw:
                     if (thhhhreadактивити == true)
                     {
@@ -123,8 +125,12 @@ namespace SamianDouble
                     else
                         thhhhreadактивити = true;
                     DataTable table = new DataTable();
-                    if (thisnod.connects_in.Count > 0 || new Node().getProvBoolПроверкаИзвестия(tmplistnodes))
+                    Invoke(new MethodInvoker(() => { labelPrintInformation.Text = "Выполняется расчет вероятности"; labelPrintInformation.BackColor = Color.Red; }));
+                    //if (thisnod.connects_in.Count > 0 || nodeclass.getProvBoolПроверкаИзвестия(tmplistnodes) == true)
+                    {
+                        вероятностьстолбец = true;
                         tmplistnodes = new NodeValueMathUp().getMathNodesAll(tmplistnodes);
+                    }
                     int len_columns = thisnod.props[0].values.Count + 1, rows;
                     try
                     {
@@ -176,7 +182,7 @@ namespace SamianDouble
                             gridcell[i, j].setvalue(i, j, Color.LightBlue, true);
                         }
                     }
-                    if (thisnod.connects_in.Count > 0 || new Node().getProvBoolПроверкаИзвестия(list))
+                    if (вероятностьстолбец)
                     {
                         table.Columns.Add("Вероятности");
                         for (i = 0; i < thisnod.props.Count; i++)
@@ -201,9 +207,12 @@ namespace SamianDouble
                                 for (j = 0; j < table.Columns.Count; j++)
                                 {
                                     dataGridView1.Rows[i].Cells[j].Style.BackColor = gridcell[i, j].color;
+                                    dataGridView1.Rows[i].Cells[j].ReadOnly = gridcell[i, j].ReadOnly;
                                 }
+                            labelPrintInformation.Text = "Расчет вероятности завершен"; labelPrintInformation.BackColor = Color.White;
                         }));
                     thhhhreadактивити = false;
+                    Console.WriteLine((DateTime.Now - time1));
                 });
             thread.Name = "Выполняетс расчет";
             thread.Start();
@@ -403,12 +412,21 @@ namespace SamianDouble
             }
             if (what == 0)
             {
+                bool удален = false;
                 Parallel.For(0, othernods.Count, (i, state) =>
                     {
-                        if (othernods[i].ID == othernod.ID)
+                        try
                         {
-                            othernods.RemoveAt(i);
-                            state.Break();
+                            if (удален == false && othernods[i].ID == othernod.ID)
+                            {
+                                удален = true;
+                                othernods.RemoveAt(i);
+                                state.Break();
+                            }
+                        }
+                        catch(System.ArgumentOutOfRangeException ex)
+                        {
+                            Console.WriteLine("Обращение к элементу массива, который был уже удален. " + ex.ToString());
                         }
                     });
             }

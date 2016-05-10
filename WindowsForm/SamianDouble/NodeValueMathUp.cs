@@ -96,6 +96,7 @@ namespace SamianDouble
 
         private Node_struct MathДетейПоИзвестномуРодителю(Node_struct nod, List<Node_struct> list)
         {
+            metkaошибказаполнителя:
             int rows = -1, column = -1;
             Parallel.Invoke(
                 () => { rows = getMatСмежКолСтрок(nod); }, () => { column = getMatCмежКолСтолбцов(nod); });
@@ -110,19 +111,30 @@ namespace SamianDouble
             {
                 Console.WriteLine("Math up info: rows - " + rows + ", column -" + column);
             }
+            Node classnode = new Node();
             MatrixСмежная[][] matrix = new MatrixСмежная[rows][];
             Parallel.For(0, rows, (i, state) => { matrix[i] = new MatrixСмежная[column]; });
-
-            matrix = getMatЗаполнитель(matrix, rows, column, 1, nod);
-
-            Node classnode = new Node();
+            bool ошибказаполнителя = false;
+                matrix = getMatЗаполнитель(matrix, rows, column, 1, nod);
+                Parallel.For(0, rows, (i, state) =>
+                {
+                    for (int j = 0; j < column - 1; j++)
+                        try
+                        {
+                            matrix[i][j].property.value_editor = 0;
+                        }
+                        catch (System.NullReferenceException ex)
+                        {
+                            Console.WriteLine("Ошибка заполнителя matirx[" + i + "][" + j + "]" + ex.ToString());
+                            ошибказаполнителя = true;
+                            break;
+                        }
+                    if (ошибказаполнителя)
+                        state.Break();
+                });
+            if (ошибказаполнителя)
+                goto metkaошибказаполнителя;
             double[] massres = new double[rows];
-            Parallel.For(0, rows, (i, state) =>
-            {
-                for (int j = 0; j < column - 1; j++)
-                    matrix[i][j].property.value_editor = 0;
-            });
-
             for (int i = 0; i < rows;i++)
             {
                 double proiz = matrix[i][column - 1].value;

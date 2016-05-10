@@ -42,10 +42,10 @@
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.button1Сохранить = new System.Windows.Forms.Button();
             this.button1Отменить = new System.Windows.Forms.Button();
-            this.button1Math = new System.Windows.Forms.Button();
             this.button1СохранитьТаблицу = new System.Windows.Forms.Button();
+            this.button1Math = new System.Windows.Forms.Button();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
+            this.labelPrintInformation = new System.Windows.Forms.ToolStripStatusLabel();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -223,16 +223,6 @@
             this.button1Отменить.Visible = false;
             this.button1Отменить.Click += new System.EventHandler(this.button1Отменить_Click);
             // 
-            // button1Math
-            // 
-            this.button1Math.Location = new System.Drawing.Point(290, 3);
-            this.button1Math.Name = "button1Math";
-            this.button1Math.Size = new System.Drawing.Size(75, 23);
-            this.button1Math.TabIndex = 2;
-            this.button1Math.Text = "Расчет";
-            this.button1Math.UseVisualStyleBackColor = true;
-            this.button1Math.Click += new System.EventHandler(this.button1Math_Click);
-            // 
             // button1СохранитьТаблицу
             // 
             this.button1СохранитьТаблицу.Location = new System.Drawing.Point(165, 3);
@@ -243,21 +233,31 @@
             this.button1СохранитьТаблицу.UseVisualStyleBackColor = true;
             this.button1СохранитьТаблицу.Click += new System.EventHandler(this.button1СохранитьТаблицу_Click);
             // 
+            // button1Math
+            // 
+            this.button1Math.Location = new System.Drawing.Point(290, 3);
+            this.button1Math.Name = "button1Math";
+            this.button1Math.Size = new System.Drawing.Size(75, 23);
+            this.button1Math.TabIndex = 2;
+            this.button1Math.Text = "Расчет";
+            this.button1Math.UseVisualStyleBackColor = true;
+            this.button1Math.Click += new System.EventHandler(this.button1Math_Click);
+            // 
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripStatusLabel1});
+            this.labelPrintInformation});
             this.statusStrip1.Location = new System.Drawing.Point(0, 507);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(896, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // toolStripStatusLabel1
+            // labelPrintInformation
             // 
-            this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(81, 17);
-            this.toolStripStatusLabel1.Text = "Информация";
+            this.labelPrintInformation.Name = "labelPrintInformation";
+            this.labelPrintInformation.Size = new System.Drawing.Size(81, 17);
+            this.labelPrintInformation.Text = "Информация";
             // 
             // EditNode
             // 
@@ -300,6 +300,6 @@
         private System.Windows.Forms.Button button1Math;
         private System.Windows.Forms.Button button1СохранитьТаблицу;
         private System.Windows.Forms.StatusStrip statusStrip1;
-        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.ToolStripStatusLabel labelPrintInformation;
     }
 }
