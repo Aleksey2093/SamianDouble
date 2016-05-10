@@ -243,16 +243,14 @@ namespace SamianDouble
                 bool ifi = true;
                 if (list[i].ID == thisnod.ID)
                     ifi = false;
-                if (ifi)
+                else if (ifi)
                 {
                     ifi = getProvConnectNodeToNode(list[i]);
                     if (ifi)
                     {
                         Othernode ot = new Othernode();
-                        ot.id = list[i].ID;
-                        ot.name = list[i].Name;
+                        ot.Node = list[i];
                         othernods.Add(ot);
-
                     }
                 }
             });
@@ -261,12 +259,28 @@ namespace SamianDouble
 
         private bool getProvConnectNodeToNode(Node_struct nodes_struct)
         {
-            for (int i = 0; i < thisnod.connects_in.Count; i++)
-                if (thisnod.connects_in[i].ID == nodes_struct.ID)
-                    return false;
-            for (int i = 0; i < thisnod.connects_out.Count; i++)
-                if (thisnod.connects_out[i].ID == nodes_struct.ID)
-                    return false;
+            bool ifi = true;
+            Parallel.Invoke(
+                () =>
+                {
+                    for (int i = 0; i < thisnod.connects_in.Count; i++)
+                        if (thisnod.connects_in[i].ID == nodes_struct.ID)
+                        {
+                            //return false;
+                            ifi = false;
+                            break;
+                        }
+                },
+                    () =>
+                    {
+                        for (int i = 0; i < thisnod.connects_out.Count; i++)
+                            if (thisnod.connects_out[i].ID == nodes_struct.ID)
+                            {
+                                //return false;
+                                ifi = false;
+                                break;
+                            }
+                    });
             return true;
         }
 
@@ -697,8 +711,21 @@ namespace SamianDouble
     }
     public class Othernode
     {
-        public int id;
-        public string name;
+        private int id;
+        private string name;
+        private Node_struct node;
+
+        /// <summary>
+        /// присвоит значение всем полям в структуре или получит нод
+        /// </summary>
+        public Node_struct Node
+        {
+            get { return node; }
+            set { node = value;
+            id = node.ID;
+            name = node.Name;
+            }
+        }
 
         public int ID
         {
