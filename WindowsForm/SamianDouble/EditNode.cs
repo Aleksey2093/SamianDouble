@@ -123,6 +123,8 @@ namespace SamianDouble
                     else
                         thhhhreadактивити = true;
                     DataTable table = new DataTable();
+                    if (thisnod.connects_in.Count > 0 || new Node().getProvBoolПроверкаИзвестия(tmplistnodes))
+                        tmplistnodes = new NodeValueMathUp().getMathNodesAll(tmplistnodes);
                     int len_columns = thisnod.props[0].values.Count + 1, rows;
                     try
                     {
