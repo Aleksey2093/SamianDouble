@@ -14,6 +14,8 @@ namespace SamianDouble
         public List<Propertys_struct> props;
         public List<Node_struct> connects_in;
         public List<Node_struct> connects_out;
+        public int cordx;
+        public int cordy;
 
         public int ID
         {

@@ -101,6 +101,7 @@
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="PaintPictureGraph.cs" />
     <Compile Include="Settings.cs">
       <SubType>Form</SubType>
     </Compile>

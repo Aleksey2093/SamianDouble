@@ -275,5 +275,44 @@ namespace SamianDouble
         {
 
         }
+
+        private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
+        {
+            //pictureBox1.CreateGraphics().DrawEllipse(new Pen(Color.Black), e.X, e.Y, 100, 100);
+            //pictureBox1 = new PaintPictureGraph().пЕрерисовка(pictureBox1, listnodes);
+            //pictureBox1.Invalidate();
+            //pictureBox1.Image = null;
+            pictureBox1.Invalidate();
+        }
+
+        private void pictureBox1_Paint(object sender, PaintEventArgs e)
+        {
+            List<Node_struct> proНарисован = new List<Node_struct>();
+            int Size = 100;
+            Random rand = new Random();
+            foreach (var nod in listnodes)
+            {
+            ццц:
+                nod.cordx = rand.Next(101, pictureBox1.Size.Width - 100);
+                nod.cordy = rand.Next(101, pictureBox1.Size.Height - 100);
+                foreach (var waw in proНарисован)
+                {
+                    if (Math.Sqrt(Math.Pow(nod.cordx - waw.cordx, 2) + Math.Pow(nod.cordy - waw.cordy, 2)) < Size + 1)
+                    {
+                        goto ццц;
+                    }
+                }
+                proНарисован.Add(nod);
+                e.Graphics.DrawEllipse(new Pen(Color.Black), nod.cordx - Size / 2, nod.cordy - Size / 2, Size, Size);
+                e.Graphics.DrawString(nod.ID.ToString(), DefaultFont, new SolidBrush(Color.Red), nod.cordx - 5, nod.cordy - 5);
+            }
+            foreach(var nod in proНарисован)
+            {
+                foreach(var wwwprop in nod.connects_out)
+                {
+                    e.Graphics.DrawLine(Pens.Black, nod.cordx, nod.cordy, wwwprop.cordx, wwwprop.cordy);
+                }
+            }
+        }
     }
 }
