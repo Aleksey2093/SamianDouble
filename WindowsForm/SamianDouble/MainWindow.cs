@@ -325,16 +325,12 @@ namespace SamianDouble
 
         private void pictureBox1_MouseClick(object sender, MouseEventArgs e)
         {
-            //pictureBox1.CreateGraphics().DrawEllipse(new Pen(Color.Black), e.X, e.Y, 100, 100);
-            //pictureBox1 = new PaintPictureGraph().пЕрерисовка(pictureBox1, listnodes);
-            //pictureBox1.Invalidate();
-            //pictureBox1.Image = null;
             pictureBox1.Invalidate();
         }
 
         private void pictureBox1_Paint(object sender, PaintEventArgs e)
         {
-            List<Node_struct> proНарисован = new List<Node_struct>();
+            /*List<Node_struct> proНарисован = new List<Node_struct>();
             int Size = 100;
             Random rand = new Random();
             foreach (var nod in listnodes)
@@ -344,13 +340,55 @@ namespace SamianDouble
                 nod.cordy = rand.Next(101, pictureBox1.Size.Height - 100);
                 foreach (var waw in proНарисован)
                 {
-                    if (Math.Sqrt(Math.Pow(nod.cordx - waw.cordx, 2) + Math.Pow(nod.cordy - waw.cordy, 2)) < Size + 1)
+                    if (Math.Sqrt(Math.Pow(nod.cordx - waw.cordx, 2) + Math.Pow(nod.cordy - waw.cordy, 2)) < Size + 10)
                     {
                         goto ццц;
                     }
                 }
                 proНарисован.Add(nod);
             }
+
+            foreach(var toch in proНарисован)
+            {
+                int powtor = 0;
+            wawfлол:
+                foreach(var line1 in proНарисован)
+                {
+                    if (line1 != toch)
+                    {
+                        foreach (var line2 in line1.connects_out)
+                        {
+                            if (line2 != toch)
+                            {
+                                double A = line2.cordy - line1.cordy;
+                                double B = line1.cordx - line2.cordx;
+                                double C = (-1) * line1.cordx * (line2.cordy - line1.cordy) + line1.cordy * (line2.cordx - line1.cordx);
+                                double T = A * A + B * B; T = Math.Sqrt(T);
+                                double res = A * toch.cordx + B * toch.cordy + C;
+                                res = res / T;
+                                if (Math.Abs(res) <= Size + 10)
+                                {
+                                    toch.cordx = rand.Next(101, pictureBox1.Size.Width - 100);
+                                    toch.cordy = rand.Next(101, pictureBox1.Size.Height - 100);
+                                    foreach (var waw in proНарисован)
+                                    {
+                                        if (Math.Sqrt(Math.Pow(toch.cordx - waw.cordx, 2) + Math.Pow(toch.cordy - waw.cordy, 2)) < Size + 10)
+                                        {
+                                            powtor++;
+                                            if (powtor > 50)
+                                            {
+                                                rand = new Random(DateTime.Now.Millisecond * toch.cordx);
+                                            }
+                                            goto wawfлол;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             foreach(var nod in proНарисован)
             {
                 foreach(var wwwprop in nod.connects_out)
@@ -364,6 +402,6 @@ namespace SamianDouble
                 e.Graphics.DrawEllipse(new Pen(Color.Black), nod.cordx - Size / 2, nod.cordy - Size / 2, Size, Size);
                 e.Graphics.DrawString(nod.ID.ToString(), DefaultFont, new SolidBrush(Color.Red), nod.cordx - 5, nod.cordy - 5);
             }
-        }
+        */}
     }
 }
