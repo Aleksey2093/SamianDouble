@@ -84,9 +84,9 @@ namespace SamianDouble
                             TreeNode nod_p = new TreeNode();
                             Parallel.Invoke(
                             () => { nod_p.Name = node_st.ID.ToString() + prope.name; },
-                            () => { nod_p.Text = prope.name; },
                             () =>
                             {
+                                nod_p.Text = prope.name;
                                 if (prope.proc100)
                                 {
                                     nod_p.BackColor = Color.Tomato;
@@ -350,8 +350,6 @@ namespace SamianDouble
                     }
                 }
                 proНарисован.Add(nod);
-                e.Graphics.DrawEllipse(new Pen(Color.Black), nod.cordx - Size / 2, nod.cordy - Size / 2, Size, Size);
-                e.Graphics.DrawString(nod.ID.ToString(), DefaultFont, new SolidBrush(Color.Red), nod.cordx - 5, nod.cordy - 5);
             }
             foreach(var nod in proНарисован)
             {
@@ -359,6 +357,12 @@ namespace SamianDouble
                 {
                     e.Graphics.DrawLine(Pens.Black, nod.cordx, nod.cordy, wwwprop.cordx, wwwprop.cordy);
                 }
+            }
+            foreach(var nod in proНарисован)
+            {
+                e.Graphics.FillEllipse(new SolidBrush(Color.White), nod.cordx - Size / 2, nod.cordy - Size / 2, Size, Size);
+                e.Graphics.DrawEllipse(new Pen(Color.Black), nod.cordx - Size / 2, nod.cordy - Size / 2, Size, Size);
+                e.Graphics.DrawString(nod.ID.ToString(), DefaultFont, new SolidBrush(Color.Red), nod.cordx - 5, nod.cordy - 5);
             }
         }
     }

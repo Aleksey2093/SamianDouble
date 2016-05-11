@@ -155,17 +155,18 @@ namespace SamianDouble
             var istnod = listnodes.AsParallel().First(x => x.ID.ToString() + x.Name == nod.Parent.Name);
             if (istnod != null)
             {
-                var awpropeaaa = istnod.props.AsParallel().First(x => x.name == nod.Text);
+                var awpropeaaa = istnod.props.AsParallel().First(x => nod.Text.StartsWith(x.name));
                 istnod.props.Remove(awpropeaaa);
                 Parallel.ForEach(istnod.connects_out, (nodуда, stateудал) =>
                 {
-                    int len = istnod.props.Count * nodуда.props[0].values.Count / (istnod.props.Count - 1) 
+                    /*int len = istnod.props.Count * nodуда.props[0].values.Count / (istnod.props.Count - 1) 
                         - nodуда.props[0].values.Count;
-                    len = nodуда.props[0].values.Count - len + 1;
-                    //int len = nodуда.props[0].values.Count - nodуда.props[0].values.Count / (istnod.props.Count + 1);
+                    len = nodуда.props[0].values.Count - len + 1;*/
+                    int len = nodуда.props[0].values.Count - nodуда.props[0].values.Count / (istnod.props.Count + 1);
+                    len = nodуда.props[0].values.Count - len;
                     foreach (var prprprp in nodуда.props)
                     {
-                        for (int j = len-1; j >=0; j--)
+                        for (int j = prprprp.values.Count-1, l = len; l > 0; j--, l--)
                             prprprp.values.RemoveAt(j);
                     }
                 });

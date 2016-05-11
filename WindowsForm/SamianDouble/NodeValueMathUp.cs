@@ -32,6 +32,11 @@ namespace SamianDouble
                 Console.WriteLine("Ошибка в методе startMathDownСначало. " + ex.ToString());
                 goto повторитьиззаошибки;
             }
+            catch (System.AggregateException ex)
+            {
+                Console.WriteLine("Ошибка в методе startMathDownСначало. " + ex.ToString());
+                goto повторитьиззаошибки;
+            }
             return list;
         }
 
