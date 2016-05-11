@@ -152,31 +152,24 @@ namespace SamianDouble
         /// <returns></returns>
         public List<Node_struct> nodeDeletePropertyThisNod(TreeNode nod, List<Node_struct> listnodes)
         {
-            Parallel.ForEach(listnodes, (nodlist, state) =>
+            var istnod = listnodes.AsParallel().First(x => x.ID.ToString() + x.Name == nod.Parent.Name);
+            if (istnod != null)
+            {
+                var awpropeaaa = istnod.props.AsParallel().First(x => x.name == nod.Text);
+                istnod.props.Remove(awpropeaaa);
+                Parallel.ForEach(istnod.connects_out, (nodуда, stateудал) =>
                 {
-                    if (nodlist.ID.ToString() + nodlist.Name == nod.Parent.Name)
+                    int len = istnod.props.Count * nodуда.props[0].values.Count / (istnod.props.Count - 1) 
+                        - nodуда.props[0].values.Count;
+                    len = nodуда.props[0].values.Count - len + 1;
+                    //int len = nodуда.props[0].values.Count - nodуда.props[0].values.Count / (istnod.props.Count + 1);
+                    foreach (var prprprp in nodуда.props)
                     {
-                        Parallel.For(0,nodlist.props.Count, (i, stateдва) =>
-                            {
-                                if (nodlist.props[i].name == nod.Text)
-                                {
-                                    nodlist.props.RemoveAt(i);
-                                    Parallel.ForEach(nodlist.connects_out, (nodуда, stateудал) =>
-                                        {
-                                            int len = nodlist.props.Count * nodуда.props[0].values.Count / (nodlist.props.Count-1) - nodуда.props[0].values.Count;
-                                            len = nodуда.props[0].values.Count - len + 1;
-                                            foreach (var prprprp in nodуда.props)
-                                            {
-                                                for (int j = 0; j < len; j++)
-                                                    prprprp.values.RemoveAt(0);
-                                            }
-                                        });
-                                    stateдва.Break();
-                                }
-                            });
-                        state.Break();
+                        for (int j = len-1; j >=0; j--)
+                            prprprp.values.RemoveAt(j);
                     }
                 });
+            }
             return listnodes;
         }
 

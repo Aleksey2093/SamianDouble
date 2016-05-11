@@ -113,7 +113,7 @@ namespace SamianDouble
                     DateTime time1 = DateTime.Now;
                     Node nodeclass = new Node();
                     int попытки = 0; bool вероятностьстолбец = false;
-                    retaw:
+                retaw:
                     if (thhhhreadактивити == true)
                     {
                         попытки++;
@@ -126,11 +126,7 @@ namespace SamianDouble
                         thhhhreadактивити = true;
                     DataTable table = new DataTable();
                     Invoke(new MethodInvoker(() => { labelPrintInformation.Text = "Выполняется расчет вероятности"; labelPrintInformation.BackColor = Color.Red; }));
-                    //if (thisnod.connects_in.Count > 0 || nodeclass.getProvBoolПроверкаИзвестия(tmplistnodes) == true)
-                    {
-                        вероятностьстолбец = true;
-                        tmplistnodes = new NodeValueMathUp().getMathNodesAll(tmplistnodes);
-                    }
+                    tmplistnodes = new NodeValueMathUp().getMathNodesAll(tmplistnodes);
                     int len_columns = thisnod.props[0].values.Count + 1, rows;
                     try
                     {
@@ -150,17 +146,8 @@ namespace SamianDouble
                     }
                     for (i = 0; i < thisnod.connects_in.Count; i++)
                     {
-                        int id = thisnod.connects_in[i].ID;
-                        for (int k = 0; k < list.Count; k++)
-                        {
-                            if (id == list[i].ID)
-                            {
-                                id = i;
-                                break;
-                            }
-                        }
                         table.Rows.Add();
-                        table.Rows[i][0] = list[id].Name;
+                        table.Rows[i][0] = thisnod.connects_in[i].Name;
                         gridcell[i, 0].setvalue(i, 0, Color.Red, true);
                     }
                     int j = 0;
@@ -172,7 +159,6 @@ namespace SamianDouble
                     }
                     //заполнены строки и столбцы. Перехожу к заполнению самой матрицы;
                     rows = rows - thisnod.props.Count;
-
                     MatrixСмежная[][] mat = getMatrixСмежность(thisnod, rows, len_columns - 1, tmplistnodes);
                     for (i = 0; i < rows; i++)
                     {
@@ -182,14 +168,11 @@ namespace SamianDouble
                             gridcell[i, j].setvalue(i, j, Color.LightBlue, true);
                         }
                     }
-                    if (вероятностьстолбец)
+                    table.Columns.Add("Вероятности");
+                    for (i = 0; i < thisnod.props.Count; i++)
                     {
-                        table.Columns.Add("Вероятности");
-                        for (i = 0; i < thisnod.props.Count; i++)
-                        {
-                            gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose, true);
-                            table.Rows[i + rows]["Вероятности"] = Math.Round(thisnod.props[i].value_editor, 4);
-                        }
+                        gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose, true);
+                        table.Rows[i + rows]["Вероятности"] = Math.Round(thisnod.props[i].value_editor, 4);
                     }
                     for (i = 0; i < thisnod.props.Count; i++)
                     {

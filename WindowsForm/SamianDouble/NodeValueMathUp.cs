@@ -13,16 +13,25 @@ namespace SamianDouble
     {
         private List<Node_struct> startMathDownСначало(List<Node_struct> list)
         {
+            повторитьиззаошибки:
             NodeValueMathDown mathdown = new NodeValueMathDown();
             EditNode editnode = new EditNode();
-            Parallel.ForEach(list, (nod, state) =>
+            try
             {
-                if (nod.connects_out.Count == 0 && nod.connects_in.Count > 0)
+                Parallel.ForEach(list, (nod, state) =>
                 {
-                    MatrixСмежная[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
-                    mathdown.getValues_editors(см, nod, list);
-                }
-            });
+                    if (nod.connects_out.Count == 0 && nod.connects_in.Count > 0)
+                    {
+                        MatrixСмежная[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
+                        mathdown.getValues_editors(см, nod, list);
+                    }
+                });
+            }
+            catch (System.IndexOutOfRangeException ex)
+            {
+                Console.WriteLine("Ошибка в методе startMathDownСначало. " + ex.ToString());
+                goto повторитьиззаошибки;
+            }
             return list;
         }
 
