@@ -29,20 +29,17 @@ namespace SamianDouble
                     state.Break(); //находим нужный нам нод и выходим из цикла
                 }
             });
-
-
             nod.connects_in.Add(other_nod);
             other_nod.connects_out.Add(nod);
-
-
+            int len = nod.props[0].values.Count * other_nod.props.Count - nod.props[0].values.Count;
             for (int j = 0; j < nod.props.Count; j++)
             {
                 int pos = 0;
-                Parallel.For(0, nod.props[j].values.Count * other_nod.props.Count-nod.props[j].values.Count, (i, state) =>
+                for (int i = 0; i < len;i++ )
                 {
                     nod.props[j].values.Add(nod.props[j].values[pos]);
                     pos++;
-                });
+                }//);
             }
             return list;
         }

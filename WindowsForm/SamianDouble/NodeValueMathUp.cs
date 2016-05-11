@@ -18,14 +18,20 @@ namespace SamianDouble
             EditNode editnode = new EditNode();
             try
             {
+                bool нуженповтор = false;
                 Parallel.ForEach(list, (nod, state) =>
                 {
                     if (nod.connects_out.Count == 0 && nod.connects_in.Count > 0)
                     {
                         MatrixСмежная[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
-                        mathdown.getValues_editors(см, nod, list);
+                        if (mathdown.getValues_editors(см, nod, list) == false)
+                            нуженповтор = true;
+                        if (нуженповтор)
+                            state.Break();
                     }
                 });
+                if (нуженповтор)
+                    goto повторитьиззаошибки;
             }
             catch (System.IndexOutOfRangeException ex)
             {
