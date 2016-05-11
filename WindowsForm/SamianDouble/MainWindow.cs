@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -38,53 +39,99 @@ namespace SamianDouble
             }
         }
 
+        private static bool перерисовкаДерева = false;
+
         /// <summary>
         /// перерисовывает дерево узлов
         /// </summary>
         /// <returns>возвращает успех работы</returns>
-        private bool treeListReplace()
+        private void treeListReplace()
         {
-            treeView1.Nodes.Clear();
-            TreeNode n1 = new TreeNode("Родители");
-            TreeNode n2 = new TreeNode("Промежуточные");
-            TreeNode n3 = new TreeNode("Дети");
-            TreeNode n4 = new TreeNode("Несвязные");
-            foreach (var node_st in listnodes)
-            {
-                TreeNode nod = new TreeNode();
-                nod.Name = node_st.ID.ToString() + node_st.Name;
-                nod.Text = node_st.Name;
-                foreach(var prope in node_st.props)
+            Thread thread = new Thread(delegate()
                 {
-                    TreeNode nod_p = new TreeNode();
-                    Parallel.Invoke(
-                    ()=> { nod_p.Name = node_st.ID.ToString() + prope.name; },
-                    ()=> { nod_p.Text = prope.name; },
-                    ()=> { if (prope.proc100) nod_p.BackColor = Color.Tomato; }
-                    );
-                    nod.Nodes.Add(nod_p);
-                }
-                if (node_st.connects_in.Count == 0)
-                {
-                    if (node_st.connects_out.Count == 0)
-                        n4.Nodes.Add(nod);
-                    else
-                        n1.Nodes.Add(nod);
-                }
-                else
-                {
-                    if (node_st.connects_out.Count == 0)
-                        n3.Nodes.Add(nod);
-                    else
-                        n2.Nodes.Add(nod);
-                }
-            }
-            treeView1.Nodes.Add(n1);
-            treeView1.Nodes.Add(n2);
-            treeView1.Nodes.Add(n3);
-            treeView1.Nodes.Add(n4);
-            treeView1.ExpandAll();
-            return true; 
+                    int err = 0;
+                    while(перерисовкаДерева)
+                    {
+                        Thread.Sleep(3000);
+                        err++;
+                        if (err > 5)
+                            return;
+                    }
+                    перерисовкаДерева = true;
+                    new NodeValueMathUp().getMathNodesAll(listnodes);
+                    TreeNode n1 = new TreeNode("Родители");
+                    TreeNode n2 = new TreeNode("Промежуточные");
+                    TreeNode n3 = new TreeNode("Дети");
+                    TreeNode n4 = new TreeNode("Несвязные");
+                    foreach (var node_st in listnodes)
+                    {
+                        TreeNode nod = new TreeNode();
+                        nod.Name = node_st.ID.ToString() + node_st.Name;
+                        nod.Text = node_st.Name;
+
+                        bool estizvest = false;
+
+                        foreach (var prope in node_st.props)
+                        {
+                            if (prope.proc100)
+                            {
+                                estizvest = true;
+                                break;
+                            }
+                        }
+                        foreach (var prope in node_st.props)
+                        {
+                            TreeNode nod_p = new TreeNode();
+                            Parallel.Invoke(
+                            () => { nod_p.Name = node_st.ID.ToString() + prope.name; },
+                            () => { nod_p.Text = prope.name; },
+                            () =>
+                            {
+                                if (prope.proc100)
+                                {
+                                    nod_p.BackColor = Color.Tomato;
+                                    nod_p.Text += " " + 100 + "%";
+                                }
+                                else if (estizvest)
+                                {
+                                    nod_p.Text += " " + "0%";
+                                }
+                                else
+                                {
+                                    nod_p.Text += " " + (prope.value_editor * 100).ToString() + "%";
+                                }
+                            }
+                            );
+                            nod.Nodes.Add(nod_p);
+                        }
+                        if (node_st.connects_in.Count == 0)
+                        {
+                            if (node_st.connects_out.Count == 0)
+                                n4.Nodes.Add(nod);
+                            else
+                                n1.Nodes.Add(nod);
+                        }
+                        else
+                        {
+                            if (node_st.connects_out.Count == 0)
+                                n3.Nodes.Add(nod);
+                            else
+                                n2.Nodes.Add(nod);
+                        }
+                    }
+                    Invoke(new MethodInvoker(() =>
+                    {
+                        treeView1.Nodes.Clear();
+                        treeView1.Nodes.Add(n1);
+                        treeView1.Nodes.Add(n2);
+                        treeView1.Nodes.Add(n3);
+                        treeView1.Nodes.Add(n4);
+                        treeView1.ExpandAll();
+                        перерисовкаДерева = false;
+                    }));
+                });
+            thread.Name = "Перерисовка дерева";
+            thread.Start();
         }
 
         private void treeView1_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)

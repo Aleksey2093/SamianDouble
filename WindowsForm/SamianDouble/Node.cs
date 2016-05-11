@@ -193,7 +193,7 @@ namespace SamianDouble
                 {
                     Parallel.For(0, nodlist.props.Count, (i, stateдва) =>
                     {
-                        if (nodlist.props[i].name == nod.Text)
+                        if (nodlist.ID.ToString()+nodlist.props[i].name == nod.Name)
                         {
                             nodlist.props[i].proc100 = ifi1;
                             stateдва.Break();
