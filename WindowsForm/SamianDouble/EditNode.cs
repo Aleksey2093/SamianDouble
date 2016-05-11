@@ -112,7 +112,7 @@ namespace SamianDouble
                 {
                     DateTime time1 = DateTime.Now;
                     Node nodeclass = new Node();
-                    int попытки = 0; bool вероятностьстолбец = false;
+                    int попытки = 0; //bool вероятностьстолбец = false;
                 retaw:
                     if (thhhhreadактивити == true)
                     {
@@ -195,7 +195,7 @@ namespace SamianDouble
                             labelPrintInformation.Text = "Расчет вероятности завершен"; labelPrintInformation.BackColor = Color.White;
                         }));
                     thhhhreadактивити = false;
-                    Console.WriteLine((DateTime.Now - time1));
+                    Console.WriteLine("Время выполнения расчета: " + (DateTime.Now - time1));
                 });
             thread.Name = "Выполняетс расчет";
             thread.Start();
@@ -502,34 +502,73 @@ namespace SamianDouble
             Сохр_таблицу_в_узел();
         }
 
+        bool cellchangedсейча = false;
         private void dataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            try
-            {
-                double сумма = 0;
-                for (int i = thisnod.connects_in.Count; i < dataGridView1.Rows.Count; i++)
+            if (cellchangedсейча)
+                return;
+            Thread thread = new Thread(delegate()
                 {
-                    double v = 0;
-                    if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString(), out v))
-                        if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString().Replace(".", ","), out v))
-                            if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString().Replace(",", "."), out v))
+                    if (cellchangedсейча)
+                        return;
+                    cellchangedсейча = true;
+                    double valueНовоеЗначение = -1;
+                    try
+                    {
+                        double сумма = 0; double v = 0;
+                        for (int i = thisnod.connects_in.Count; i < dataGridView1.Rows.Count; i++)
+                        {
+                            v = 0;
+                            if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString(), out v))
+                                if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString().Replace(".", ","), out v))
+                                    if (!double.TryParse(dataGridView1.Rows[i].Cells[e.ColumnIndex].Value.ToString().Replace(",", "."), out v))
+                                    {
+                                        dataGridView1.Rows[i].Cells[e.ColumnIndex].Value = "0";
+                                        cellchangedсейча = false;
+                                        return;
+                                    }
+                            if (v < 0)
                             {
-                                dataGridView1.Rows[i].Cells[e.ColumnIndex].Value = "0";
+                                v = Math.Abs(v);
+                                Invoke(new MethodInvoker(() => { dataGridView1.Rows[i].Cells[e.ColumnIndex].Value = v; }));
+                            }
+                            if (thisnod.props.Count == 2)
+                            {
+                                Invoke(new MethodInvoker(() =>
+                                    {
+                                        if (!double.TryParse(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), out v))
+                                            if (!double.TryParse(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString().Replace(".", ","), out v))
+                                                if (!double.TryParse(dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString().Replace(",", "."), out v))
+                                                {  }
+                                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = v;
+                                        if (dataGridView1.Rows.Count - 1 == e.RowIndex)
+                                            dataGridView1.Rows[e.RowIndex - 1].Cells[e.ColumnIndex].Value = Math.Round(1 - v, 4);
+                                        else
+                                            dataGridView1.Rows[e.RowIndex + 1].Cells[e.ColumnIndex].Value = Math.Round(1 - v, 4);
+                                    }));
+                                cellchangedсейча = false;
                                 return;
                             }
-                    if (v < 0)
-                        dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = Math.Abs(v).ToString();
-                    else
-                        v = Math.Abs(v);
-                    сумма += v;
-                }
-                if (сумма > 1)
-                    dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = "0";
-            }
-            catch (Exception)
-            {
-                dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = "0";
-            }
+                            сумма += v;
+                        }
+                        if (сумма > 1)
+                            valueНовоеЗначение = 0;
+                    }
+                    catch (Exception)
+                    {
+                        valueНовоеЗначение = 0;
+                    }
+                    finally
+                    {
+                        if (valueНовоеЗначение != -1)
+                        {
+                            Invoke(new MethodInvoker(() => { dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = valueНовоеЗначение; }));
+                        }
+                    }
+                    cellchangedсейча = false;
+                });
+            thread.Name = "Значения в столбце после ввода пользователем";
+            thread.Start();
         }
     }
     public class Othernode

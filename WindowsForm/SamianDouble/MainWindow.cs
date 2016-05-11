@@ -63,61 +63,68 @@ namespace SamianDouble
                     TreeNode n2 = new TreeNode("Промежуточные");
                     TreeNode n3 = new TreeNode("Дети");
                     TreeNode n4 = new TreeNode("Несвязные");
-                    foreach (var node_st in listnodes)
+                    try
                     {
-                        TreeNode nod = new TreeNode();
-                        nod.Name = node_st.ID.ToString() + node_st.Name;
-                        nod.Text = node_st.Name;
-
-                        bool estizvest = false;
-
-                        foreach (var prope in node_st.props)
+                        foreach (var node_st in listnodes)
                         {
-                            if (prope.proc100)
+                            TreeNode nod = new TreeNode();
+                            nod.Name = node_st.ID.ToString() + node_st.Name;
+                            nod.Text = node_st.Name;
+
+                            bool estizvest = false;
+
+                            foreach (var prope in node_st.props)
                             {
-                                estizvest = true;
-                                break;
-                            }
-                        }
-                        foreach (var prope in node_st.props)
-                        {
-                            TreeNode nod_p = new TreeNode();
-                            Parallel.Invoke(
-                            () => { nod_p.Name = node_st.ID.ToString() + prope.name; },
-                            () =>
-                            {
-                                nod_p.Text = prope.name;
                                 if (prope.proc100)
                                 {
-                                    nod_p.BackColor = Color.Tomato;
-                                    nod_p.Text += " " + 100 + "%";
-                                }
-                                else if (estizvest)
-                                {
-                                    nod_p.Text += " " + "0%";
-                                }
-                                else
-                                {
-                                    nod_p.Text += " " + (prope.value_editor * 100).ToString() + "%";
+                                    estizvest = true;
+                                    break;
                                 }
                             }
-                            );
-                            nod.Nodes.Add(nod_p);
-                        }
-                        if (node_st.connects_in.Count == 0)
-                        {
-                            if (node_st.connects_out.Count == 0)
-                                n4.Nodes.Add(nod);
+                            foreach (var prope in node_st.props)
+                            {
+                                TreeNode nod_p = new TreeNode();
+                                Parallel.Invoke(
+                                () => { nod_p.Name = node_st.ID.ToString() + prope.name; },
+                                () =>
+                                {
+                                    nod_p.Text = prope.name;
+                                    if (prope.proc100)
+                                    {
+                                        nod_p.BackColor = Color.Tomato;
+                                        nod_p.Text += " " + 100 + "%";
+                                    }
+                                    else if (estizvest)
+                                    {
+                                        nod_p.Text += " " + "0%";
+                                    }
+                                    else
+                                    {
+                                        nod_p.Text += " " + (prope.value_editor * 100).ToString() + "%";
+                                    }
+                                }
+                                );
+                                nod.Nodes.Add(nod_p);
+                            }
+                            if (node_st.connects_in.Count == 0)
+                            {
+                                if (node_st.connects_out.Count == 0)
+                                    n4.Nodes.Add(nod);
+                                else
+                                    n1.Nodes.Add(nod);
+                            }
                             else
-                                n1.Nodes.Add(nod);
+                            {
+                                if (node_st.connects_out.Count == 0)
+                                    n3.Nodes.Add(nod);
+                                else
+                                    n2.Nodes.Add(nod);
+                            }
                         }
-                        else
-                        {
-                            if (node_st.connects_out.Count == 0)
-                                n3.Nodes.Add(nod);
-                            else
-                                n2.Nodes.Add(nod);
-                        }
+                    }
+                    catch(System.InvalidOperationException ex)
+                    {
+                        Console.WriteLine("Во время перирисовки дерева коллекция была изменена. Дата " + DateTime.Now.TimeOfDay + ex.ToString());
                     }
                     Invoke(new MethodInvoker(() =>
                     {
