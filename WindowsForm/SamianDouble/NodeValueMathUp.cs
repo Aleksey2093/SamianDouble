@@ -47,7 +47,7 @@ namespace SamianDouble
             return list;
         }
 
-        private int getMatСмежКолСтрок(Node_struct nod)
+        private int getMatСмежКолСтрок(Node_struct nod, bool ifi)
         {
             Node nodes = new Node();
             int kolvo = nod.props.Count;
@@ -55,12 +55,13 @@ namespace SamianDouble
             foreach(var ot in nod.connects_in)
             {
                 if (!nodes.getEstProperyTrueFix(ot.props))
-                    kolvo *= getMatСмежКолСтрок(ot);
+                    kolvo *= getMatСмежКолСтрок(ot,false);
+                //else
             }//);
             return kolvo;
         }
 
-        private int getMatCмежКолСтолбцов(Node_struct nod)
+        private int getMatCмежКолСтолбцов(Node_struct nod, bool ifi)
         {
             Node nodes = new Node();
             int kolvo = 1;
@@ -68,7 +69,7 @@ namespace SamianDouble
             foreach(var ot in nod.connects_in)
                 {
                     if (!nodes.getEstProperyTrueFix(ot.props))
-                        kolvo += getMatCмежКолСтолбцов(ot);
+                        kolvo += getMatCмежКолСтолбцов(ot,false);
                 }//);
             return kolvo;
         }
@@ -169,7 +170,7 @@ namespace SamianDouble
             metkaошибказаполнителя:
             int rows = -1, column = -1;
             Parallel.Invoke(
-                () => { rows = getMatСмежКолСтрок(nod); }, () => { column = getMatCмежКолСтолбцов(nod); });
+                () => { rows = getMatСмежКолСтрок(nod,false); }, () => { column = getMatCмежКолСтолбцов(nod,false); });
             if (rows == -1 || column == -1)
             {
                 Console.WriteLine("-------------------------------------------");
@@ -238,15 +239,17 @@ namespace SamianDouble
             for (int i = 0; i < list.Count; i++)
             {
                 if (list[i].connects_out.Count == 0 && list[i].connects_in.Count > 0)
+                {
+                    startMathГлубже(list, list[i]);
                     foreach (var pppp in list[i].props)
                     {
                         if (pppp.proc100 == true)
                         {
                             list = MathДетейПоИзвестномуРодителю(list[i], list);
-                            startMathГлубже(list, list[i]);
                             break;
                         }
                     }
+                }
             }//);
             return list;
         }
