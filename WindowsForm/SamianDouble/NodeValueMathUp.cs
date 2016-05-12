@@ -83,6 +83,8 @@ namespace SamianDouble
 
         private /*MatrixСмежная[][]*/ MatЗаполнитель getMatЗаполнитель(/*MatrixСмежная[][]*/ MatЗаполнитель mat, /*int rows, int column, int h, */Node_struct nod, bool izvest)
         {
+            if (mat.column == 0)
+                return mat;
             Node nodes = new Node();
             MatrixСмежная[][] matrix = mat.matrix;
             int rows = mat.rows, column = mat.column, h = mat.h;
@@ -91,7 +93,16 @@ namespace SamianDouble
             retigoto:
                 if (hw < h)
                 {
-                    matrix[i][column - 1].nod = nod;
+                    try
+                    {
+                        matrix[i][column - 1].nod = nod;
+                    }
+                    catch(System.NullReferenceException ex)
+                    {
+                        Console.WriteLine("Нулевой элемент матрицы создаем указатель. " + ex.Message);
+                        matrix[i][column - 1] = new MatrixСмежная();
+                        goto retigoto;
+                    }
                     matrix[i][column - 1].property = nod.props[j];
                     //if (izvest == false)
                         matrix[i][column - 1].value = nod.props[j].values[hv];
@@ -124,8 +135,6 @@ namespace SamianDouble
             mat.rows = rows;
             mat.column = column-1;
             mat.h = h;
-            if (mat.column == 0)
-                return mat;
             /*Parallel.ForEach(nod.connects_in, (nodfr, state) =>
                 {
                     if (!nodes.getEstProperyTrueFix(nodfr.props))
@@ -155,7 +164,7 @@ namespace SamianDouble
             return mat;
         }
 
-        private Node_struct MathДетейПоИзвестномуРодителю(Node_struct nod, List<Node_struct> list)
+        private List<Node_struct> MathДетейПоИзвестномуРодителю(Node_struct nod, List<Node_struct> list)
         {
             metkaошибказаполнителя:
             int rows = -1, column = -1;
@@ -166,7 +175,7 @@ namespace SamianDouble
                 Console.WriteLine("-------------------------------------------");
                 Console.WriteLine("Ошибка в вычислениях вверх метод - по известному родителю");
                 Console.WriteLine("-------------------------------------------");
-                return nod;
+                return list;
             }
             else
             {
@@ -216,11 +225,11 @@ namespace SamianDouble
                 {
                     if (matrix[i][column - 1].property.proc100)
                     {
-                        matrix[i][j].property.value_editor += massres[i] / matrix[i][column - 1].property.value_editor;
+                        matrix[i][j].property.value_editor += massres[i] / matrix[i][column - 1].property.value_editor_down;
                     }
                 }
             }
-            return nod;
+            return list;
         }
 
         private List<Node_struct> startMathUp(List<Node_struct> list)
@@ -228,23 +237,59 @@ namespace SamianDouble
             //Parallel.For(0, list.Count, (i, state) =>
             for (int i = 0; i < list.Count; i++)
             {
-                foreach (var pppp in list[i].props)
-                {
-                    if (pppp.proc100 == true)
+                if (list[i].connects_out.Count == 0 && list[i].connects_in.Count > 0)
+                    foreach (var pppp in list[i].props)
                     {
-                        list[i] = MathДетейПоИзвестномуРодителю(list[i], list);
-                        break;
+                        if (pppp.proc100 == true)
+                        {
+                            list = MathДетейПоИзвестномуРодителю(list[i], list);
+                            startMathГлубже(list, list[i]);
+                            break;
+                        }
                     }
-                }
             }//);
+            return list;
+        }
+
+        private List<Node_struct> startMathГлубже(List<Node_struct> list, Node_struct nod)
+        {
+            foreach(var n in nod.connects_in)
+            {
+                if (n.connects_in.Count > 0)
+                {
+                    foreach (var pppp in n.props)
+                    {
+                        if (pppp.proc100 == true)
+                        {
+                            list = MathДетейПоИзвестномуРодителю(n, list);
+                            break;
+                        }
+                    }
+                    startMathГлубже(list, n);
+                }
+            }
             return list;
         }
 
         public List<Node_struct> getMathNodesAll(List<Node_struct> list)
         {
             list = startMathDownСначало(list);
+            foreach(var nod in list)
+            {
+                foreach(var w in nod.props)
+                {
+                    w.value_editor = -1;
+                }
+            }
             list = startMathUp(list);
-
+            foreach (var nod in list)
+            {
+                foreach (var w in nod.props)
+                {
+                    if (w.value_editor == -1)
+                        w.value_editor = w.value_editor_down;
+                }
+            }
             return list;
         }
 

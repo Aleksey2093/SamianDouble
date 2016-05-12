@@ -32,10 +32,11 @@ namespace SamianDouble
     {
         public String name;
         public List<double> values;
+        public double value_editor_down;
         public double value_editor;
         public bool proc100 = false;
     }
-    public struct MatrixСмежная
+    public class MatrixСмежная
     {
         private Node_struct nod1;
         private Propertys_struct property1;

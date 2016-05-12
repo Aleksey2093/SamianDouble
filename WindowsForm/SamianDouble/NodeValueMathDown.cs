@@ -60,7 +60,7 @@ namespace SamianDouble
                     }
                 }
                 //values[i] = Math.Round(values[i], 4);
-                nod.props[i].value_editor = values[i];
+                nod.props[i].value_editor_down = nod.props[i].value_editor = values[i];
             }
             Console.WriteLine("down nod - " + nod.ID + " " + nod.Name);
             return true;
@@ -90,11 +90,11 @@ namespace SamianDouble
                 MatrixСмежная[][] см = new EditNode().getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
                 if (getValues_editors(см, nod, list)==false)
                     goto иззаошибки;
-                value = proppppp.value_editor;//nod.props[i].value_editor;
+                value = proppppp.value_editor = proppppp.value_editor_down;//nod.props[i].value_editor;
             }
             else
             {
-                value = proppppp.value_editor = proppppp.values[0];//nod.props[i].values[0];
+                value = proppppp.value_editor_down = proppppp.value_editor = proppppp.values[0];//nod.props[i].values[0];
             }
             return value;
         }

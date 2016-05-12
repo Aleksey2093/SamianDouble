@@ -64,6 +64,13 @@ namespace SamianDouble
             for (int i = 0; i < colrow; i++)
             {
                 mat[i] = new MatrixСмежная[colcol];
+                for (int j=0;j<colcol;j++)
+                {
+                    mat[i][j] = new MatrixСмежная();
+                    mat[i][j].nod = new Node_struct();
+                    mat[i][j].property = new Propertys_struct();
+                    mat[i][j].value = new double();
+                }
             }
             foreach(var nood in tmpinode.connects_in)
             {
@@ -181,10 +188,11 @@ namespace SamianDouble
                         }
                     }
                     table.Columns.Add("Вероятности");
+                    table.Rows[rows - 1]["Вероятности"] = "Вероятности";
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
                         gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose, true);
-                        table.Rows[i + rows]["Вероятности"] = Math.Round(thisnod.props[i].value_editor, 4);
+                        table.Rows[i + rows]["Вероятности"] = (Math.Round(thisnod.props[i].value_editor, 4) * 100).ToString() + "%";
                     }
                     for (i = 0; i < thisnod.props.Count; i++)
                     {

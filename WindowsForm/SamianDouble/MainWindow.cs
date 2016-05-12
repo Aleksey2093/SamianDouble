@@ -100,7 +100,7 @@ namespace SamianDouble
                                     }
                                     else
                                     {
-                                        nod_p.Text += " " + (prope.value_editor * 100).ToString() + "%";
+                                        nod_p.Text += " " + Math.Round(prope.value_editor * 100,2).ToString() + "%";
                                     }
                                 }
                                 );
