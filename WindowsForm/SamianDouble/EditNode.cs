@@ -64,6 +64,13 @@ namespace SamianDouble
             for (int i = 0; i < colrow; i++)
             {
                 mat[i] = new MatrixСмежная[colcol];
+                for (int j=0;j<colcol;j++)
+                {
+                    mat[i][j] = new MatrixСмежная();
+                    mat[i][j].nod = new Node_struct();
+                    mat[i][j].property = new Propertys_struct();
+                    mat[i][j].value = new double();
+                }
             }
             foreach(var nood in tmpinode.connects_in)
             {
