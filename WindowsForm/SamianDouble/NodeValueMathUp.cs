@@ -85,7 +85,11 @@ namespace SamianDouble
         private /*MatrixСмежная[][]*/ MatЗаполнитель getMatЗаполнитель(/*MatrixСмежная[][]*/ MatЗаполнитель mat, /*int rows, int column, int h, */Node_struct nod, bool izvest)
         {
             if (mat.column == 0)
+            {
+                Console.WriteLine("Заполнитель уперся в нулевой столбец");
                 return mat;
+            }
+            Console.WriteLine("Заполнитель id nod - " + nod.ID);
             Node nodes = new Node();
             MatrixСмежная[][] matrix = mat.matrix;
             int rows = mat.rows, column = mat.column, h = mat.h;
@@ -96,6 +100,8 @@ namespace SamianDouble
                 {
                     try
                     {
+                        if (matrix[i][column - 1] == null)
+                            matrix[i][column - 1] = new MatrixСмежная();
                         matrix[i][column - 1].nod = nod;
                     }
                     catch(System.NullReferenceException ex)
@@ -154,13 +160,13 @@ namespace SamianDouble
                         incon[j] = incon[i];
                     }
                 }*/
-
+            bool waw = false;
                     foreach (var nodf in nod.connects_in)
                     {
                         if (!nodes.getEstProperyTrueFix(nodf.props))
+                        {
                             mat = getMatЗаполнитель(mat, nodf, false);
-                        /*else
-                            mat = getMatЗаполнитель(mat, nodf, true);*/
+                        }
                     }
             return mat;
         }
@@ -169,8 +175,9 @@ namespace SamianDouble
         {
             metkaошибказаполнителя:
             int rows = -1, column = -1;
-            Parallel.Invoke(
-                () => { rows = getMatСмежКолСтрок(nod,false); }, () => { column = getMatCмежКолСтолбцов(nod,false); });
+            //Parallel.Invoke(
+               // () => { rows = getMatСмежКолСтрок(nod,false); }, () => { column = getMatCмежКолСтолбцов(nod,false); });
+            rows = getMatСмежКолСтрок(nod, false); column = getMatCмежКолСтолбцов(nod, false);
             if (rows == -1 || column == -1)
             {
                 Console.WriteLine("-------------------------------------------");
@@ -192,6 +199,16 @@ namespace SamianDouble
             mat.h = 1;
             bool ошибказаполнителя = false;
                 matrix = getMatЗаполнитель(mat/*, rows, column, 1*/, nod,false).matrix;
+                Console.WriteLine("--------------------------");
+                for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < column; j++)
+                    {
+                        Console.Write(matrix[i][j].nod.ID.ToString() + "_" + matrix[i][j].property.name + "_" + matrix[i][j].value + "\t");
+                    }
+                    Console.WriteLine();
+                }
+                        Console.WriteLine("--------------------------");
                 //Parallel.For(0, rows, (i, state) =>
                 for (int i = 0; i < rows;i++ )
                 {

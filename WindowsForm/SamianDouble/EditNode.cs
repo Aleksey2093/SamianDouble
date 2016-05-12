@@ -188,7 +188,8 @@ namespace SamianDouble
                         }
                     }
                     table.Columns.Add("Вероятности");
-                    table.Rows[rows - 1]["Вероятности"] = "Вероятности";
+                    try { table.Rows[rows - 1]["Вероятности"] = "Вероятности"; }
+                    catch { }
                     for (i = 0; i < thisnod.props.Count; i++)
                     {
                         gridcell[i + rows, len_columns].setvalue(i, j, Color.MistyRose, true);
@@ -494,7 +495,7 @@ namespace SamianDouble
                             }
                     thisnod.props[i - thisnod.connects_in.Count].values[j - 1] = value;
                 }
-            try
+            /*try
             {
                 for (int i = thisnod.connects_in.Count; i < n; i++)
                 {
@@ -513,7 +514,7 @@ namespace SamianDouble
             catch (Exception ex)
             {
                 Console.WriteLine("Нету столбца вероятностей. Ошибка - " + ex.ToString());
-            }
+            }*/
             return true;
         }
 
