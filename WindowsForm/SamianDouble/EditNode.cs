@@ -71,37 +71,49 @@ namespace SamianDouble
             }
             if (idnodes.Count == 0)
                 return mat;
-            //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
-            for (int i = colrow - 1, index = 0, h = 1; i >= 0; i--, index++)
+            for (int i = 0; i < idnodes.Count - 1; i++)
             {
-                //цикл движется от последней строки до первой
-                //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
-                int hh = 0; var othnod = idnodes[i];
-                for (int j = 0, ij = 0; j < colcol; j++)
+                for (int j = i+1; j < idnodes.Count; j++)
                 {
-                ifigoto:
-                    if (hh < h)
+                    if (idnodes[i].ID > idnodes[j].ID)
                     {
-                        mat[i][j].nod = othnod;
-                        mat[i][j].property = othnod.props[ij];
-                        hh++;
+                        Node_struct aw = idnodes[i];
+                        idnodes[i] = idnodes[j];
+                        idnodes[j] = aw;
                     }
-                    else
-                    {
-                        ij++;
-                        if (ij >= othnod.props.Count)
-                            ij = 0;
-                        hh = 0;
-                        goto ifigoto;
-                    }
-                }
-                if (h == 1)
-                    h = othnod.props.Count;
-                else
-                {
-                    h = h * othnod.props.Count;
                 }
             }
+                //сформировали список индексов в листе tmp тех узлов с которыми у нас есть связь, чтобы не приходилось их потом вылавливать
+                for (int i = colrow - 1, index = 0, h = 1; i >= 0; i--, index++)
+                {
+                    //цикл движется от последней строки до первой
+                    //в строке он заполняет ячейки матрицы ид нода и названием (уникально в пределах нода) нужного свойства
+                    int hh = 0; var othnod = idnodes[i];
+                    for (int j = 0, ij = 0; j < colcol; j++)
+                    {
+                    ifigoto:
+                        if (hh < h)
+                        {
+                            mat[i][j].nod = othnod;
+                            mat[i][j].property = othnod.props[ij];
+                            hh++;
+                        }
+                        else
+                        {
+                            ij++;
+                            if (ij >= othnod.props.Count)
+                                ij = 0;
+                            hh = 0;
+                            goto ifigoto;
+                        }
+                    }
+                    if (h == 1)
+                        h = othnod.props.Count;
+                    else
+                    {
+                        h = h * othnod.props.Count;
+                    }
+                }
             //получили верхнюю часть матрицы смежности поидее в нужном нам виде.
             return mat;
         }

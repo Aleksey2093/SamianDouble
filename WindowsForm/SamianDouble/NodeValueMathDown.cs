@@ -24,21 +24,26 @@ namespace SamianDouble
             int n = смежность.Length;
             int m = смежность[0].Length;
             double[,] matrix = new double[n, m];
-            for (int i = 0; i < n; i++)
-                Parallel.For(0, m, (j, state) =>
+            for (int i = n-1; i >= 0; i--)
+                for (int j = 0; j < m;j++)
                 {
                     Node_struct idnod = смежность[i][j].nod;
                     Propertys_struct nameprop = смежность[i][j].property;
                     double v1 = getNodPropsValueEditor(list, idnod, nameprop);
                     matrix[i, j] = v1;
-                });
-            Parallel.For(0, m, (j, state) =>
+                }
+            Console.WriteLine("down nod - " + nod.ID + " " + nod.Name);
+            /*Parallel.For(0, m, (j, state) =>*/
+            for (int j = 0; j < m;j++ )
             {
                 for (int i = 1; i < n; i++)
                 {
-                    matrix[0, j] = matrix[0, j] * matrix[i, j];
+                    double a1 = matrix[0, j];
+                    double a2 = matrix[i, j];
+                    matrix[0, j] = a1 * a2;
                 }
-            });
+            }//);
+            
             for (int i = 0; i < values.Length; i++)
             {
                 values[i] = 0;
@@ -54,9 +59,10 @@ namespace SamianDouble
                         return false;
                     }
                 }
-                values[i] = Math.Round(values[i], 4);
+                //values[i] = Math.Round(values[i], 4);
                 nod.props[i].value_editor = values[i];
             }
+            Console.WriteLine("down nod - " + nod.ID + " " + nod.Name);
             return true;
         }
         public double getNodPropsValueEditor(List<Node_struct> list, Node_struct nod, Propertys_struct proppppp)
@@ -88,7 +94,7 @@ namespace SamianDouble
             }
             else
             {
-                value = proppppp.values[0];//nod.props[i].values[0];
+                value = proppppp.value_editor = proppppp.values[0];//nod.props[i].values[0];
             }
             return value;
         }

@@ -18,20 +18,21 @@ namespace SamianDouble
             EditNode editnode = new EditNode();
             try
             {
-                bool нуженповтор = false;
-                Parallel.ForEach(list, (nod, state) =>
+                //bool нуженповтор = false;
+                /*Parallel.ForEach(list, (nod, state) =>*/
+                foreach(var nod in list)
                 {
                     if (nod.connects_out.Count == 0 && nod.connects_in.Count > 0)
                     {
                         MatrixСмежная[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
-                        if (mathdown.getValues_editors(см, nod, list) == false)
-                            нуженповтор = true;
+                        if (mathdown.getValues_editors(см, nod, list) == false) goto повторитьиззаошибки;
+                           /* нуженповтор = true;
                         if (нуженповтор)
-                            state.Break();
+                            state.Break();*/
                     }
-                });
-                if (нуженповтор)
-                    goto повторитьиззаошибки;
+                }//);
+                /*if (нуженповтор)
+                    goto повторитьиззаошибки;*/
             }
             catch (System.IndexOutOfRangeException ex)
             {
@@ -50,11 +51,12 @@ namespace SamianDouble
         {
             Node nodes = new Node();
             int kolvo = nod.props.Count;
-            Parallel.ForEach(nod.connects_in, (ot, state) =>
+            //Parallel.ForEach(nod.connects_in, (ot, state) =>
+            foreach(var ot in nod.connects_in)
             {
                 if (!nodes.getEstProperyTrueFix(ot.props))
                     kolvo *= getMatСмежКолСтрок(ot);
-            });
+            }//);
             return kolvo;
         }
 
@@ -62,16 +64,28 @@ namespace SamianDouble
         {
             Node nodes = new Node();
             int kolvo = 1;
-            Parallel.ForEach(nod.connects_in, (ot, state) =>
+            //Parallel.ForEach(nod.connects_in, (ot, state) =>
+            foreach(var ot in nod.connects_in)
                 {
                     if (!nodes.getEstProperyTrueFix(ot.props))
                         kolvo += getMatCмежКолСтолбцов(ot);
-                });
+                }//);
             return kolvo;
         }
-        private MatrixСмежная[][] getMatЗаполнитель(MatrixСмежная[][] matrix, int rows, int column, int h, Node_struct nod)
+
+        private struct MatЗаполнитель
+        {
+            public MatrixСмежная[][] matrix;
+            public int rows;
+            public int column;
+            public int h;
+        }
+
+        private /*MatrixСмежная[][]*/ MatЗаполнитель getMatЗаполнитель(/*MatrixСмежная[][]*/ MatЗаполнитель mat, /*int rows, int column, int h, */Node_struct nod, bool izvest)
         {
             Node nodes = new Node();
+            MatrixСмежная[][] matrix = mat.matrix;
+            int rows = mat.rows, column = mat.column, h = mat.h;
             for (int i=0,hw=0,hv=0,j=0;i<rows;i++)
             {
             retigoto:
@@ -79,7 +93,12 @@ namespace SamianDouble
                 {
                     matrix[i][column - 1].nod = nod;
                     matrix[i][column - 1].property = nod.props[j];
-                    matrix[i][column - 1].value = nod.props[j].values[hv];
+                    //if (izvest == false)
+                        matrix[i][column - 1].value = nod.props[j].values[hv];
+                    /*else if (nod.props[j].proc100)
+                        matrix[i][column - 1].value = 1;
+                    else
+                        matrix[i][column - 1].value = 0;*/
                     hw++;
                 }
                 else
@@ -101,17 +120,39 @@ namespace SamianDouble
                 h=nod.props.Count;
             else
                 h*=nod.props.Count;
-            Parallel.ForEach(nod.connects_in, (nodfr, state) =>
+            mat.matrix = matrix;
+            mat.rows = rows;
+            mat.column = column-1;
+            mat.h = h;
+            if (mat.column == 0)
+                return mat;
+            /*Parallel.ForEach(nod.connects_in, (nodfr, state) =>
                 {
                     if (!nodes.getEstProperyTrueFix(nodfr.props))
-                        matrix = getMatЗаполнитель(matrix, rows, column - 1, h, nodfr);
-                });
-            /*foreach(var nodfr in nod.connects_in)
-            {
-                if (!nodes.getEstProperyTrueFix(nodfr.props))
-                    matrix = getMatЗаполнитель(matrix, rows, column - 1, h, nodfr);
-            }*/
-            return matrix;
+                        mat = getMatЗаполнитель(mat, nodfr);
+                        //mat = getMatЗаполнитель(mat, rows, column - 1, h, nodfr);
+                });*/
+            List<Node_struct> incon = new List<Node_struct>();
+            incon = nod.connects_in;
+            /*for (int i = 0; i < incon.Count; i++)
+                for (int j = 0; j < incon.Count;j++ )
+                {
+                    if (incon[i].ID>incon[j].ID)
+                    {
+                        Node_struct aw = incon[i];
+                        incon[i] = incon[j];
+                        incon[j] = incon[i];
+                    }
+                }*/
+
+                    foreach (var nodf in nod.connects_in)
+                    {
+                        if (!nodes.getEstProperyTrueFix(nodf.props))
+                            mat = getMatЗаполнитель(mat, nodf, false);
+                        /*else
+                            mat = getMatЗаполнитель(mat, nodf, true);*/
+                    }
+            return mat;
         }
 
         private Node_struct MathДетейПоИзвестномуРодителю(Node_struct nod, List<Node_struct> list)
@@ -134,9 +175,15 @@ namespace SamianDouble
             Node classnode = new Node();
             MatrixСмежная[][] matrix = new MatrixСмежная[rows][];
             Parallel.For(0, rows, (i, state) => { matrix[i] = new MatrixСмежная[column]; });
+            MatЗаполнитель mat = new MatЗаполнитель();
+            mat.matrix = matrix;
+            mat.rows = rows;
+            mat.column = column;
+            mat.h = 1;
             bool ошибказаполнителя = false;
-                matrix = getMatЗаполнитель(matrix, rows, column, 1, nod);
-                Parallel.For(0, rows, (i, state) =>
+                matrix = getMatЗаполнитель(mat/*, rows, column, 1*/, nod,false).matrix;
+                //Parallel.For(0, rows, (i, state) =>
+                for (int i = 0; i < rows;i++ )
                 {
                     for (int j = 0; j < column - 1; j++)
                         try
@@ -149,12 +196,13 @@ namespace SamianDouble
                             ошибказаполнителя = true;
                             break;
                         }
-                    if (ошибказаполнителя)
-                        state.Break();
-                });
+                    //if (ошибказаполнителя)
+                    //state.Break();
+                }//);
             if (ошибказаполнителя)
                 goto metkaошибказаполнителя;
             double[] massres = new double[rows];
+            double[,] mati = new double[rows, column - 1];
             for (int i = 0; i < rows;i++)
             {
                 double proiz = matrix[i][column - 1].value;
@@ -177,17 +225,18 @@ namespace SamianDouble
 
         private List<Node_struct> startMathUp(List<Node_struct> list)
         {
-            Parallel.For(0, list.Count, (i, state) =>
+            //Parallel.For(0, list.Count, (i, state) =>
+            for (int i = 0; i < list.Count; i++)
             {
                 foreach (var pppp in list[i].props)
                 {
                     if (pppp.proc100 == true)
                     {
-                        list[i] = MathДетейПоИзвестномуРодителю(list[i],list);
+                        list[i] = MathДетейПоИзвестномуРодителю(list[i], list);
                         break;
                     }
                 }
-            });
+            }//);
             return list;
         }
 
