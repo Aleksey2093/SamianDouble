@@ -54,7 +54,7 @@ namespace SamianDouble
             //Parallel.ForEach(nod.connects_in, (ot, state) =>
             foreach(var ot in nod.connects_in)
             {
-                if (!nodes.getEstProperyTrueFix(ot.props))
+                //if (!nodes.getEstProperyTrueFix(ot.props))
                     kolvo *= getMatСмежКолСтрок(ot,false);
                 //else
             }//);
@@ -68,7 +68,7 @@ namespace SamianDouble
             //Parallel.ForEach(nod.connects_in, (ot, state) =>
             foreach(var ot in nod.connects_in)
                 {
-                    if (!nodes.getEstProperyTrueFix(ot.props))
+                    //if (!nodes.getEstProperyTrueFix(ot.props))
                         kolvo += getMatCмежКолСтолбцов(ot,false);
                 }//);
             return kolvo;
@@ -98,25 +98,9 @@ namespace SamianDouble
             retigoto:
                 if (hw < h)
                 {
-                    try
-                    {
-                        if (matrix[i][column - 1] == null)
-                            matrix[i][column - 1] = new MatrixСмежная();
-                        matrix[i][column - 1].nod = nod;
-                    }
-                    catch(System.NullReferenceException ex)
-                    {
-                        Console.WriteLine("Нулевой элемент матрицы создаем указатель. " + ex.Message);
-                        matrix[i][column - 1] = new MatrixСмежная();
-                        goto retigoto;
-                    }
+                    matrix[i][column - 1].nod = nod;
                     matrix[i][column - 1].property = nod.props[j];
-                    //if (izvest == false)
-                        matrix[i][column - 1].value = nod.props[j].values[hv];
-                    /*else if (nod.props[j].proc100)
-                        matrix[i][column - 1].value = 1;
-                    else
-                        matrix[i][column - 1].value = 0;*/
+                    matrix[i][column - 1].value = nod.props[j].values[hv];
                     hw++;
                 }
                 else
@@ -142,28 +126,10 @@ namespace SamianDouble
             mat.rows = rows;
             mat.column = column-1;
             mat.h = h;
-            /*Parallel.ForEach(nod.connects_in, (nodfr, state) =>
-                {
-                    if (!nodes.getEstProperyTrueFix(nodfr.props))
-                        mat = getMatЗаполнитель(mat, nodfr);
-                        //mat = getMatЗаполнитель(mat, rows, column - 1, h, nodfr);
-                });*/
             List<Node_struct> incon = new List<Node_struct>();
-            incon = nod.connects_in;
-            /*for (int i = 0; i < incon.Count; i++)
-                for (int j = 0; j < incon.Count;j++ )
-                {
-                    if (incon[i].ID>incon[j].ID)
-                    {
-                        Node_struct aw = incon[i];
-                        incon[i] = incon[j];
-                        incon[j] = incon[i];
-                    }
-                }*/
-            bool waw = false;
                     foreach (var nodf in nod.connects_in)
                     {
-                        if (!nodes.getEstProperyTrueFix(nodf.props))
+                        //if (!nodes.getEstProperyTrueFix(nodf.props))
                         {
                             mat = getMatЗаполнитель(mat, nodf, false);
                         }
@@ -175,9 +141,8 @@ namespace SamianDouble
         {
             metkaошибказаполнителя:
             int rows = -1, column = -1;
-            //Parallel.Invoke(
-               // () => { rows = getMatСмежКолСтрок(nod,false); }, () => { column = getMatCмежКолСтолбцов(nod,false); });
-            rows = getMatСмежКолСтрок(nod, false); column = getMatCмежКолСтолбцов(nod, false);
+            rows = getMatСмежКолСтрок(nod, false); 
+            column = getMatCмежКолСтолбцов(nod, false);
             if (rows == -1 || column == -1)
             {
                 Console.WriteLine("-------------------------------------------");
@@ -191,7 +156,14 @@ namespace SamianDouble
             }
             Node classnode = new Node();
             MatrixСмежная[][] matrix = new MatrixСмежная[rows][];
-            Parallel.For(0, rows, (i, state) => { matrix[i] = new MatrixСмежная[column]; });
+            Parallel.For(0, rows, (i, state) =>
+            {
+                matrix[i] = new MatrixСмежная[column];
+                for (int j=0;j<column;j++)
+                {
+                    matrix[i][j] = new MatrixСмежная();
+                }
+            });
             MatЗаполнитель mat = new MatЗаполнитель();
             mat.matrix = matrix;
             mat.rows = rows;
@@ -199,23 +171,18 @@ namespace SamianDouble
             mat.h = 1;
             bool ошибказаполнителя = false;
                 matrix = getMatЗаполнитель(mat/*, rows, column, 1*/, nod,false).matrix;
-                Console.WriteLine("--------------------------");
+                Console.WriteLine("++++--------------------------++++");
                 for (int i = 0; i < rows; i++)
-                {
-                    for (int j = 0; j < column; j++)
-                    {
-                        Console.Write(matrix[i][j].nod.ID.ToString() + "_" + matrix[i][j].property.name + "_" + matrix[i][j].value + "\t");
-                    }
-                    Console.WriteLine();
-                }
-                        Console.WriteLine("--------------------------");
-                //Parallel.For(0, rows, (i, state) =>
-                for (int i = 0; i < rows;i++ )
                 {
                     for (int j = 0; j < column - 1; j++)
                         try
                         {
-                            matrix[i][j].property.value_editor = 0;
+                            if (classnode.getEstProperyTrueFix(matrix[i][j].nod.props) == false)
+                                matrix[i][j].property.value_editor = 0;
+                            else if (matrix[i][j].property.proc100)
+                                matrix[i][j].value = 1;
+                            else
+                                matrix[i][j].value = 0;
                         }
                         catch (System.NullReferenceException ex)
                         {
@@ -223,9 +190,38 @@ namespace SamianDouble
                             ошибказаполнителя = true;
                             break;
                         }
-                    //if (ошибказаполнителя)
-                    //state.Break();
-                }//);
+                }    
+            for (int i = 0; i < rows; i++)
+                {
+                    for (int j = 0; j < column; j++)
+                    {
+                        if (matrix[i][j].nod != null)
+                            Console.Write(matrix[i][j].nod.ID.ToString() + "_" + matrix[i][j].property.name + "_" + matrix[i][j].value + "\t");
+                    }
+                    if (matrix[i][column-1].property.proc100)
+                        Console.WriteLine("+");
+                    else
+                        Console.WriteLine("-");
+                }
+                        Console.WriteLine("--------------------------");
+                        for (int i = 0; i < rows; i++)
+                        {
+                            for (int j = 0; j < column; j++)
+                            {
+                                Console.Write(matrix[i][j].value + "\t");
+                            }
+                            if (matrix[i][column - 1].property.proc100)
+                                Console.WriteLine("+");
+                            else
+                                Console.WriteLine("-");
+                        }
+                        Console.WriteLine("--------------------------");
+                        Console.WriteLine("Информация о родителе id - " + nod.ID + " , name - " + nod.Name + ": ");
+                        for (int i = 0; i < nod.props.Count;i++ )
+                        {
+                            Console.WriteLine("editor: " + nod.props[i].value_editor + " , down: " + nod.props[i].value_editor_down);
+                        }
+                        Console.WriteLine("++++--------------------------++++");
             if (ошибказаполнителя)
                 goto metkaошибказаполнителя;
             double[] massres = new double[rows];
@@ -234,7 +230,10 @@ namespace SamianDouble
             {
                 double proiz = matrix[i][column - 1].value;
                 for (int j = 0; j < column - 1; j++)
-                    proiz *= matrix[i][j].value;
+                {
+                    if (matrix[i][j].nod != null)
+                        proiz *= matrix[i][j].value;
+                }
                 massres[i] = proiz;
             }
             for (int j = 0; j < column - 1; j++)
@@ -243,7 +242,8 @@ namespace SamianDouble
                 {
                     if (matrix[i][column - 1].property.proc100)
                     {
-                        matrix[i][j].property.value_editor += massres[i] / matrix[i][column - 1].property.value_editor_down;
+                        if (matrix[i][j].nod != null)
+                            matrix[i][j].property.value_editor += massres[i] / matrix[i][column - 1].property.value_editor_down;
                     }
                 }
             }
@@ -257,7 +257,6 @@ namespace SamianDouble
             {
                 if (list[i].connects_out.Count == 0 && list[i].connects_in.Count > 0)
                 {
-                    startMathГлубже(list, list[i]);
                     foreach (var pppp in list[i].props)
                     {
                         if (pppp.proc100 == true)
@@ -266,8 +265,16 @@ namespace SamianDouble
                             break;
                         }
                     }
+                    //startMathГлубже(list, list[i]);
                 }
-            }//);
+            }
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].connects_out.Count == 0 && list[i].connects_in.Count > 0)
+                {
+                    startMathГлубже(list, list[i]);
+                }
+            }
             return list;
         }
 
@@ -285,6 +292,13 @@ namespace SamianDouble
                             break;
                         }
                     }
+                    //startMathГлубже(list, n);
+                }
+            }
+            foreach (var n in nod.connects_in)
+            {
+                if (n.connects_in.Count > 0)
+                {
                     startMathГлубже(list, n);
                 }
             }
