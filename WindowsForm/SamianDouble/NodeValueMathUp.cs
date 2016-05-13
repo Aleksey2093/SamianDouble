@@ -18,21 +18,14 @@ namespace SamianDouble
             EditNode editnode = new EditNode();
             try
             {
-                //bool нуженповтор = false;
-                /*Parallel.ForEach(list, (nod, state) =>*/
                 foreach(var nod in list)
                 {
                     if (nod.connects_out.Count == 0 && nod.connects_in.Count > 0)
                     {
                         MatrixСмежная[][] см = editnode.getMatrixСмежность(nod, nod.connects_in.Count, nod.props[0].values.Count, list);
                         if (mathdown.getValues_editors(см, nod, list) == false) goto повторитьиззаошибки;
-                           /* нуженповтор = true;
-                        if (нуженповтор)
-                            state.Break();*/
                     }
-                }//);
-                /*if (нуженповтор)
-                    goto повторитьиззаошибки;*/
+                }
             }
             catch (System.IndexOutOfRangeException ex)
             {
@@ -51,13 +44,13 @@ namespace SamianDouble
         {
             Node nodes = new Node();
             int kolvo = nod.props.Count;
-            //Parallel.ForEach(nod.connects_in, (ot, state) =>
             foreach(var ot in nod.connects_in)
             {
-                //if (!nodes.getEstProperyTrueFix(ot.props))
-                    kolvo *= getMatСмежКолСтрок(ot,false);
-                //else
-            }//);
+                if (!nodes.getEstProperyTrueFix(ot.props))
+                    kolvo *= getMatСмежКолСтрок(ot, false);
+                else
+                    kolvo *= ot.props.Count;
+            }
             return kolvo;
         }
 
@@ -65,12 +58,13 @@ namespace SamianDouble
         {
             Node nodes = new Node();
             int kolvo = 1;
-            //Parallel.ForEach(nod.connects_in, (ot, state) =>
             foreach(var ot in nod.connects_in)
                 {
-                    //if (!nodes.getEstProperyTrueFix(ot.props))
-                        kolvo += getMatCмежКолСтолбцов(ot,false);
-                }//);
+                    if (!nodes.getEstProperyTrueFix(ot.props))
+                        kolvo += getMatCмежКолСтолбцов(ot, false);
+                    else
+                        kolvo += 1;
+                }
             return kolvo;
         }
 
@@ -126,22 +120,24 @@ namespace SamianDouble
             mat.rows = rows;
             mat.column = column-1;
             mat.h = h;
+            if (izvest)
+                return mat;
             List<Node_struct> incon = new List<Node_struct>();
                     foreach (var nodf in nod.connects_in)
                     {
-                        //if (!nodes.getEstProperyTrueFix(nodf.props))
-                        {
+                        if (!nodes.getEstProperyTrueFix(nodf.props))
                             mat = getMatЗаполнитель(mat, nodf, false);
-                        }
+                        else
+                            mat = getMatЗаполнитель(mat, nodf, true);
                     }
             return mat;
         }
 
         private List<Node_struct> MathДетейПоИзвестномуРодителю(Node_struct nod, List<Node_struct> list)
         {
-            metkaошибказаполнителя:
+        metkaошибказаполнителя:
             int rows = -1, column = -1;
-            rows = getMatСмежКолСтрок(nod, false); 
+            rows = getMatСмежКолСтрок(nod, false);
             column = getMatCмежКолСтолбцов(nod, false);
             if (rows == -1 || column == -1)
             {
@@ -159,7 +155,7 @@ namespace SamianDouble
             Parallel.For(0, rows, (i, state) =>
             {
                 matrix[i] = new MatrixСмежная[column];
-                for (int j=0;j<column;j++)
+                for (int j = 0; j < column; j++)
                 {
                     matrix[i][j] = new MatrixСмежная();
                 }
@@ -170,63 +166,32 @@ namespace SamianDouble
             mat.column = column;
             mat.h = 1;
             bool ошибказаполнителя = false;
-                matrix = getMatЗаполнитель(mat/*, rows, column, 1*/, nod,false).matrix;
-                Console.WriteLine("++++--------------------------++++");
-                for (int i = 0; i < rows; i++)
-                {
-                    for (int j = 0; j < column - 1; j++)
-                        try
-                        {
-                            if (classnode.getEstProperyTrueFix(matrix[i][j].nod.props) == false)
-                                matrix[i][j].property.value_editor = 0;
-                            else if (matrix[i][j].property.proc100)
-                                matrix[i][j].value = 1;
-                            else
-                                matrix[i][j].value = 0;
-                        }
-                        catch (System.NullReferenceException ex)
-                        {
-                            Console.WriteLine("Ошибка заполнителя matirx[" + i + "][" + j + "]" + ex.ToString());
-                            ошибказаполнителя = true;
-                            break;
-                        }
-                }    
+            matrix = getMatЗаполнитель(mat/*, rows, column, 1*/, nod, false).matrix;
             for (int i = 0; i < rows; i++)
-                {
-                    for (int j = 0; j < column; j++)
+            {
+                for (int j = 0; j < column-1; j++)
+                    try
                     {
-                        if (matrix[i][j].nod != null)
-                            Console.Write(matrix[i][j].nod.ID.ToString() + "_" + matrix[i][j].property.name + "_" + matrix[i][j].value + "\t");
+                        if (classnode.getEstProperyTrueFix(matrix[i][j].nod.props) == false)
+                            matrix[i][j].property.value_editor = 0;
+                        else if (matrix[i][j].property.proc100)
+                            matrix[i][j].value = 1;
+                        else
+                            matrix[i][j].value = 0;
                     }
-                    if (matrix[i][column-1].property.proc100)
-                        Console.WriteLine("+");
-                    else
-                        Console.WriteLine("-");
-                }
-                        Console.WriteLine("--------------------------");
-                        for (int i = 0; i < rows; i++)
-                        {
-                            for (int j = 0; j < column; j++)
-                            {
-                                Console.Write(matrix[i][j].value + "\t");
-                            }
-                            if (matrix[i][column - 1].property.proc100)
-                                Console.WriteLine("+");
-                            else
-                                Console.WriteLine("-");
-                        }
-                        Console.WriteLine("--------------------------");
-                        Console.WriteLine("Информация о родителе id - " + nod.ID + " , name - " + nod.Name + ": ");
-                        for (int i = 0; i < nod.props.Count;i++ )
-                        {
-                            Console.WriteLine("editor: " + nod.props[i].value_editor + " , down: " + nod.props[i].value_editor_down);
-                        }
-                        Console.WriteLine("++++--------------------------++++");
+                    catch (System.NullReferenceException ex)
+                    {
+                        Console.WriteLine("Ошибка заполнителя matirx[" + i + "][" + j + "]" + ex.ToString());
+                        ошибказаполнителя = true;
+                        break;
+                    }
+            }
+            
             if (ошибказаполнителя)
                 goto metkaошибказаполнителя;
             double[] massres = new double[rows];
             double[,] mati = new double[rows, column - 1];
-            for (int i = 0; i < rows;i++)
+            for (int i = 0; i < rows; i++)
             {
                 double proiz = matrix[i][column - 1].value;
                 for (int j = 0; j < column - 1; j++)
@@ -236,18 +201,56 @@ namespace SamianDouble
                 }
                 massres[i] = proiz;
             }
-            for (int j = 0; j < column - 1; j++)
+            печатьИнформации(rows,column,matrix,nod,massres);
+            for (int j = 0; j < column/* - 1*/; j++)
             {
                 for (int i = 0; i < rows; i++)
                 {
                     if (matrix[i][column - 1].property.proc100)
                     {
-                        if (matrix[i][j].nod != null)
-                            matrix[i][j].property.value_editor += massres[i] / matrix[i][column - 1].property.value_editor_down;
+                        matrix[i][j].property.value_editor += massres[i] / matrix[i][column - 1].property.value_editor_down;
                     }
                 }
             }
             return list;
+        }
+
+        private void печатьИнформации(int rows, int column, MatrixСмежная[][] matrix, Node_struct nod, double[] massres)
+        {
+                        Console.WriteLine("++++--------------------------++++");
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < column; j++)
+                {
+                    if (matrix[i][j].nod != null)
+                        Console.Write(matrix[i][j].nod.ID.ToString() + "_" + matrix[i][j].property.name + "_" + matrix[i][j].value + "\t");
+                }
+                if (matrix[i][column - 1].property.proc100)
+                    Console.Write("+\t");
+                else
+                    Console.Write("-\t");
+                Console.WriteLine(massres[i]);
+            }
+            Console.WriteLine("--------------------------");
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < column; j++)
+                {
+                    Console.Write(matrix[i][j].value + "\t");
+                }
+                if (matrix[i][column - 1].property.proc100)
+                    Console.Write("+\t");
+                else
+                    Console.Write("-\t");
+                Console.WriteLine(massres[i]);
+            }
+            Console.WriteLine("--------------------------");
+            Console.WriteLine("Информация о родителе id - " + nod.ID + " , name - " + nod.Name + ": ");
+            for (int i = 0; i < nod.props.Count; i++)
+            {
+                Console.WriteLine("editor: " + nod.props[i].value_editor + " , down: " + nod.props[i].value_editor_down);
+            }
+            Console.WriteLine("++++--------------------------++++");
         }
 
         private List<Node_struct> startMathUp(List<Node_struct> list)

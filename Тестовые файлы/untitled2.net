@@ -1,25 +1,38 @@
 net
 {
-	propagationenginegenerator1791944048146838126L = "edu.ucla.belief.approx.BeliefPropagationSettings@abeb805";
-	recoveryenginegenerator6944530267470113528l = "edu.ucla.util.SettingsImpl@65c4e0af";
+	propagationenginegenerator1791944048146838126L = "edu.ucla.belief.approx.BeliefPropagationSettings@347cae10";
+	recoveryenginegenerator6944530267470113528l = "edu.ucla.util.SettingsImpl@52276430";
 	node_size = (130.0 55.0);
 }
 
+node variable2
+{
+	states = ("state0" "state1" );
+	position = (363 -232);
+	diagnosistype = "AUXILIARY";
+	DSLxSUBMODEL = "Root Submodel";
+	ismapvariable = "false";
+	ID = "variable2";
+	label = "variable2";
+	DSLxEXTRA_DEFINITIONxDIAGNOSIS_TYPE = "AUXILIARY";
+	excludepolicy = "include whole CPT";
+}
 node variable4
 {
 	states = ("state0" "state1" );
-	position = (586 -59);
+	position = (438 -43);
 	diagnosistype = "AUXILIARY";
 	DSLxSUBMODEL = "Root Submodel";
 	ismapvariable = "false";
 	ID = "variable4";
 	label = "variable4";
+	DSLxEXTRA_DEFINITIONxDIAGNOSIS_TYPE = "AUXILIARY";
 	excludepolicy = "include whole CPT";
 }
 node variable1
 {
 	states = ("state0" "state1" );
-	position = (190 -153);
+	position = (188 -153);
 	diagnosistype = "AUXILIARY";
 	DSLxSUBMODEL = "Root Submodel";
 	ismapvariable = "false";
@@ -40,22 +53,10 @@ node variable0
 	DSLxEXTRA_DEFINITIONxDIAGNOSIS_TYPE = "AUXILIARY";
 	excludepolicy = "include whole CPT";
 }
-node variable2
-{
-	states = ("state0" "state1" );
-	position = (557 -306);
-	diagnosistype = "AUXILIARY";
-	DSLxSUBMODEL = "Root Submodel";
-	ismapvariable = "false";
-	ID = "variable2";
-	label = "variable2";
-	DSLxEXTRA_DEFINITIONxDIAGNOSIS_TYPE = "AUXILIARY";
-	excludepolicy = "include whole CPT";
-}
 node variable3
 {
 	states = ("state0" "state1" );
-	position = (635 -154);
+	position = (401 -134);
 	diagnosistype = "AUXILIARY";
 	DSLxSUBMODEL = "Root Submodel";
 	ismapvariable = "false";
@@ -64,9 +65,16 @@ node variable3
 	DSLxEXTRA_DEFINITIONxDIAGNOSIS_TYPE = "AUXILIARY";
 	excludepolicy = "include whole CPT";
 }
+potential ( variable2 | variable1 variable3 )
+{
+	data = (((	0.7	0.3	)
+		(	0.6	0.4	))
+		((	0.4	0.6	)
+		(	0.2	0.8	)));
+}
 potential ( variable4 | )
 {
-	data = (	0.6	0.4	);
+	data = (	0.3	0.7	);
 }
 potential ( variable1 | variable0 )
 {
@@ -76,13 +84,6 @@ potential ( variable1 | variable0 )
 potential ( variable0 | )
 {
 	data = (	0.6	0.4	);
-}
-potential ( variable2 | variable1 variable3 )
-{
-	data = (((	0.7	0.3	)
-		(	0.6	0.4	))
-		((	0.4	0.6	)
-		(	0.2	0.8	)));
 }
 potential ( variable3 | variable4 )
 {

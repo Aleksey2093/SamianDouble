@@ -11,6 +11,13 @@ namespace SamianDouble
     /// </summary>
     class NodeValueMathDown
     {
+
+        /*struct MatrixСобиратель
+        {
+            MatrixСмежная[][] смежность;
+            double matrix[,] matrix;
+        }*/
+
         /// <summary>
         /// получение вероятностей
         /// </summary>
@@ -20,6 +27,7 @@ namespace SamianDouble
         /// <returns></returns>
         public bool getValues_editors(MatrixСмежная[][] смежность, Node_struct nod, List<Node_struct> list)
         {
+            Node nodeclass = new Node();
             double[] values = new double[nod.props.Count];
             int n = смежность.Length;
             int m = смежность[0].Length;
@@ -38,9 +46,16 @@ namespace SamianDouble
             {
                 for (int i = 1; i < n; i++)
                 {
-                    double a1 = matrix[0, j];
-                    double a2 = matrix[i, j];
-                    matrix[0, j] = a1 * a2;
+                    /*if (nodeclass.getEstProperyTrueFix(смежность[i][j].nod.props) == false)
+                    {*/
+                        double a1 = matrix[0, j];
+                        double a2 = matrix[i, j];
+                        matrix[0, j] = a1 * a2;
+                    /*}
+                    else if (смежность[i][j].property.proc100 == false)
+                    {
+                        matrix[0, j] = matrix[0, j] * 0;
+                    }*/
                 }
             }//);
             
@@ -77,13 +92,17 @@ namespace SamianDouble
                     break;
                 }
             }
-            if (enab)
+            if (enab /*&& nod.connects_in.Count == 0*/) //тут у нас просто ребенок поэтому ему можем спокойно присвоить 1 и 0
             {
                 if (proppppp.proc100)
                     value = 1;
                 else
                     value = 0;
             }
+            /*else if (enab && nod.connects_in.Count > 0) //а тут раз у нас и родитель и беренок то это событие нужно отлавливать
+            {
+                //вот этот момент интересне это родитель и сын одновременно
+            }*/
             else if (proppppp.values.Count > 1)
             {
             иззаошибки:
@@ -92,7 +111,7 @@ namespace SamianDouble
                     goto иззаошибки;
                 value = proppppp.value_editor = proppppp.value_editor_down;//nod.props[i].value_editor;
             }
-            else
+            else /*if (nod.connects_in.Count > 0)*/
             {
                 value = proppppp.value_editor_down = proppppp.value_editor = proppppp.values[0];//nod.props[i].values[0];
             }

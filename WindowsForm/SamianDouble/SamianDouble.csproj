@@ -101,6 +101,7 @@
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="NodeValueMathUp2.cs" />
     <Compile Include="PaintPictureGraph.cs" />
     <Compile Include="Settings.cs">
       <SubType>Form</SubType>

@@ -108,13 +108,13 @@
 		<prop>
 			<name>Props1</name>
 			<values>
-				<value>0,6</value>
+				<value>0,3</value>
 			</values>
 		</prop>
 		<prop>
 			<name>Props2</name>
 			<values>
-				<value>0,4</value>
+				<value>0,7</value>
 			</values>
 		</prop>
 	</propertis>

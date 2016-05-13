@@ -155,7 +155,7 @@ namespace SamianDouble
                             return listnodesold;
                         }
                     }
-                    /*if (line.ChildNodes.Count > 30)
+                    /*if (line.ChildNodes.Count > 3)
                     {
                         List<int> connecslist = new List<int>();
                         int oneconnect;
@@ -221,7 +221,7 @@ namespace SamianDouble
         public bool проверкаЗагруженногоФайла(List<Node_struct> list)
         {
             return true;
-            bool corr = true;
+            /*bool corr = true;
             Node nodeclass = new Node();
             List<string> errrors = new List<string>();
             Parallel.ForEach(list, (nod, statenod) =>
@@ -326,7 +326,7 @@ namespace SamianDouble
                     }
                 }
             });
-            return corr;
+            return corr;*/
         }
 
         public bool saveToFile(List<Node_struct> listnodes)
